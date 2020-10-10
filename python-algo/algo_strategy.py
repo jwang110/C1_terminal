@@ -100,8 +100,21 @@ class AlgoStrategy(gamelib.AlgoCore):
         self.build_reactive_defense(game_state)
 
         # If the turn is less than 5, stall with interceptors and wait to see enemy's base
-        if game_state.turn_number < 5:
-            self.stall_with_interceptors(game_state)
+        if game_state.turn_number < 2:
+            if game_state.turn_number==0:
+                game_state.attempt_spawn(FACTORY,[[13,0],[14,0]])
+                game_state.attempt_spawn(INTERCEPTOR,[[8,5],[12,1],[18,4],[22,8],[27,13]])
+                game_state.attempt_spawn(TURRET,[[4,12]])
+                game_state.attempt_upgrade([[13,0]])
+            if game_state.turn_number==1:
+                if SP<9:
+                    game_state.attempt_spawn(TURRET,[[9,12],[23,12]])
+                    game_state.attempt_spawn(WALL,[[9,13]])
+                if SP>=9:
+                    game_state.attempt_upgrade([[14,0]])
+                    if (SP-9)>=2:
+                        game_state.attempt_spawn(TURRET,[[23,12]])
+                    game_state.attempt_spawn(INTERCEPTOR,[[8,5],[12,1],[18,4],[22,8],[27,13],[0,13]])
         else:
             # Now let's analyze the enemy base to see where their defenses are concentrated.
             # If they have many units in the front we can build a line for our demolishers to attack them at long range.
