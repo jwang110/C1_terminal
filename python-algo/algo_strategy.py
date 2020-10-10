@@ -187,6 +187,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                 turret_candidate_ = []
                 for new_factory in new_factories:
                     turret_candidate_ += self.find_turret_location(new_factory)
+
                 turret_candidate = list(set(turret_candidate_+TURRET_LOCATIONS))
                 i = 0
                 j = 0
@@ -240,6 +241,8 @@ class AlgoStrategy(gamelib.AlgoCore):
                     j += 1
         return new_strategies
 
+    def wall_spawn(self, game_state, strategies):
+        
     def find_turret_location(self, location):
         '''
         :param location:
@@ -247,7 +250,8 @@ class AlgoStrategy(gamelib.AlgoCore):
         '''
         x = location[0]
         y = location[1]
-        return [[x+14-y, 14], [x-14+y, 14]]
+        return [[x+12-y, 12], [x-12+y, 12]]
+
 
     """
     NOTE: All the methods after this point are part of the sample starter-algo
