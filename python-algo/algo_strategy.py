@@ -65,20 +65,20 @@ class AlgoStrategy(gamelib.AlgoCore):
         game_state.submit_turn()
 
 
-    def create_strategy_list(self, game_state):
-        '''
+    # def create_strategy_list(self, game_state):
+    #     '''
 
-        :param game_state:
-        :return: list of strategy to be searched
-        '''
-        self.current_game_map = game_state.game_map.copy()
-        self.current_state = game_state.copy()
+    #     :param game_state:
+    #     :return: list of strategy to be searched
+    #     '''
+    #     self.current_game_map = game_state.game_map.copy()
+    #     self.current_state = game_state.copy()
 
 
 
-    def factory_spawn(self, game_state):
-        self.current_state.
-        pass
+    # def factory_spawn(self, game_state):
+    #     self.current_state.
+    #     pass
     """
     NOTE: All the methods after this point are part of the sample starter-algo
     strategy and can safely be replaced for your custom algo.
@@ -263,32 +263,32 @@ class AlgoStrategy(gamelib.AlgoCore):
                 self.scored_on_locations.append(location)
                 gamelib.debug_write("All locations: {}".format(self.scored_on_locations))
 
-    ################################################################################################################
-    def id_alphabeta_advance(self, game, time_left, depth, alpha=float("-inf"), beta=float("inf"), my_turn=True):
-        Ordered_Nodes = dict()
-        # current_move and current_val is just used to prevent losting Memory of Previous best and can check time out easily
-        best_move, best_val, current_move, current_val = None, None, None, None
+    # ################################################################################################################
+    # def id_alphabeta_advance(self, game, time_left, depth, alpha=float("-inf"), beta=float("inf"), my_turn=True):
+    #     Ordered_Nodes = dict()
+    #     # current_move and current_val is just used to prevent losting Memory of Previous best and can check time out easily
+    #     best_move, best_val, current_move, current_val = None, None, None, None
 
-        for i in range(1, depth):
-            if time_left() <= 60:
-                # print(Ordered_Nodes)
-                print((best_move, best_val))
-                return (best_move, best_val)
-            current_move, current_val, Ordered_Nodes = helper_advance(player, game, time_left, i, alpha, beta, True,
-                                                                      Ordered_Nodes)
-            # print(i,current_move,current_val)
-            # Update it or directly return
-            if current_move != 'No Time':
-                best_move, best_val = current_move, current_val
-            else:
-                # print(Ordered_Nodes)
-                # print('No time left!! at depth',i)
-                print((best_move, best_val))
-                return (best_move, best_val)
-        print((best_move, best_val))
-        # print(Ordered_Nodes)
-        return (best_move, best_val)
-    #
+    #     for i in range(1, depth):
+    #         if time_left() <= 60:
+    #             # print(Ordered_Nodes)
+    #             print((best_move, best_val))
+    #             return (best_move, best_val)
+    #         current_move, current_val, Ordered_Nodes = helper_advance(player, game, time_left, i, alpha, beta, True,
+    #                                                                   Ordered_Nodes)
+    #         # print(i,current_move,current_val)
+    #         # Update it or directly return
+    #         if current_move != 'No Time':
+    #             best_move, best_val = current_move, current_val
+    #         else:
+    #             # print(Ordered_Nodes)
+    #             # print('No time left!! at depth',i)
+    #             print((best_move, best_val))
+    #             return (best_move, best_val)
+    #     print((best_move, best_val))
+    #     # print(Ordered_Nodes)
+    #     return (best_move, best_val)
+    # #
     #
     # def helper_advance(player, game, time_left, depth, alpha, beta, my_turn, Ordered_Nodes):
     #     def max_value_alphabeta(current_game, player, d, time_left, alpha, beta):
