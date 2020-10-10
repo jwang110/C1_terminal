@@ -59,7 +59,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         game_state.suppress_warnings(True)  #Comment or remove this line to enable warnings.
 
         self.starter_strategy(game_state)
-
+        self.ab_strategy(game_state)
         game_state.submit_turn()
 
 
@@ -163,24 +163,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                         game_state.attempt_spawn(TURRET,[[23,12]])
                     game_state.attempt_spawn(INTERCEPTOR,[[8,5],[12,1],[18,4],[22,8],[27,13],[0,13]])
         else:
-            # Now let's analyze the enemy base to see where their defenses are concentrated.
-            # If they have many units in the front we can build a line for our demolishers to attack them at long range.
-            if self.detect_enemy_unit(game_state, unit_type=None, valid_x=None, valid_y=[14, 15]) > 10:
-                self.demolisher_line_strategy(game_state)
-            else:
-                # They don't have many units in the front so lets figure out their least defended area and send Scouts there.
-
-                # Only spawn Scouts every other turn
-                # Sending more at once is better since attacks can only hit a single scout at a time
-                if game_state.turn_number % 2 == 1:
-                    # To simplify we will just check sending them from back left and right
-                    scout_spawn_location_options = [[13, 0], [14, 0]]
-                    best_location = self.least_damage_spawn_location(game_state, scout_spawn_location_options)
-                    game_state.attempt_spawn(SCOUT, best_location, 1000)
-
-                # Lastly, if we have spare SP, let's build some Factories to generate more resources
-                factory_locations = [[13, 2], [14, 2], [13, 3], [14, 3]]
-                game_state.attempt_spawn(FACTORY, factory_locations)
+            pass
 
     def build_defences(self, game_state):
         """
@@ -314,163 +297,193 @@ class AlgoStrategy(gamelib.AlgoCore):
                 gamelib.debug_write("All locations: {}".format(self.scored_on_locations))
 
     ################################################################################################################
-    def id_alphabeta_advance(self, game, time_left, depth, alpha=float("-inf"), beta=float("inf"), my_turn=True):
-        Ordered_Nodes = dict()
-        # current_move and current_val is just used to prevent losting Memory of Previous best and can check time out easily
-        best_move, best_val, current_move, current_val = None, None, None, None
+    def ab_strategy_result(self,game_state):
+        
+	# Give 4 seconds, max depth = 20
+        time_left = 4.0
+        depth = 20
+        
+	# IDAB Search for best strategy 
+        strategy,_ = self.id_alphabeta_advance(game_state, time_left, depth)
+        # given strategy
+        game_state.attempt_spawn(FACTORY,strategy['FACTORY'])
+        game_state.attempt_spawn(INTERCEPTOR,strategy['INTERCEPTOR'])
+        game_state.attempt_spawn(TURRET,strategy['TURRET'])
+        game_state.attempt_spawn(SCOUT ,strategy['SCOUT'])
+        game_state.attempt_spawn(WALL,strategy['WALL'])
+        game_state.attempt_spawn(DEMOLISHER,strategy['DEMOLISHER'])        
+        game_state.attempt_upgrade(strategy['UPGRADE'])         
+        
 
-        for i in range(1, depth):
-            if time_left() <= 60:
-                # print(Ordered_Nodes)
-                print((best_move, best_val))
-                return (best_move, best_val)
-            current_move, current_val, Ordered_Nodes = helper_advance(player, game, time_left, i, alpha, beta, True,
-                                                                      Ordered_Nodes)
-            # print(i,current_move,current_val)
+    def id_alphabeta_advance(self, game, time_left, depth, alpha=float("-inf"), beta=float("inf"), my_turn=True):
+	# game is the game_state
+	# time_left control time
+	# Iterate over given max depth
+	
+        # current_strategy and current_val is just used to prevent losing Memory of Previous best and can check time out easily
+	# We can use the global Ordered_Nodes here to help us store more and save time
+        best_strategy, best_val, current_strategy, current_val = None, None, None, None
+        time_start = time.time()
+
+        # We evaluate the results only at 2 turns finished
+        for i in range(2, depth, 2):
+            time_left = time.time()-time_start
+            if time_left <= 0.01:
+                print((best_strategy, best_val))
+                return (best_strategy, best_val)
+            current_strategy, current_val = self.helper_advance(game, time_left, i, alpha, beta, True)
+            # print(i,current_strategy,current_val)
             # Update it or directly return
-            if current_move != 'No Time':
-                best_move, best_val = current_move, current_val
+            if current_strategy != 'No Time':
+                best_strategy, best_val = current_strategy, current_val
             else:
                 # print(Ordered_Nodes)
                 # print('No time left!! at depth',i)
-                print((best_move, best_val))
-                return (best_move, best_val)
-        print((best_move, best_val))
+                print((best_strategy, best_val))
+                return (best_strategy, best_val)
+        print((best_strategy, best_val))
         # print(Ordered_Nodes)
-        return (best_move, best_val)
+        return (best_strategy, best_val)
     #
-    #
-    # def helper_advance(player, game, time_left, depth, alpha, beta, my_turn, Ordered_Nodes):
-    #     def max_value_alphabeta(current_game, player, d, time_left, alpha, beta):
-    #
-    #         nonlocal Ordered_Nodes
-    #
-    #         best_move = None
-    #         best_val = float('-inf')
-    #         current_val = None
-    #         current_move = None
-    #
-    #         # Check time left
-    #         if time_left() <= 50:
-    #             return ('No Time', None)
-    #         # Reach at the maximum nodes
-    #         if d <= 0:
-    #             # return current_game.get_player_position(player),player.eval_fn.score(current_game, player)
-    #             return current_game.get_player_position(player), player.utility(current_game, True)
-    #
-    #         # Then we can do the next moves
-    #         Temp = Ordered_Nodes.get((current_game.print_board(), 'Max'))
-    #         if Temp is None:
-    #             # print('No')
-    #             next_moves = current_game.get_player_moves(player)
-    #         else:
-    #             # print('Yes')
-    #             temp = []
-    #             temp.append(Temp)
-    #             temp.extend([i for i in current_game.get_player_moves(player) if i != Temp])
-    #             next_moves = temp.copy()
-    #
-    #         move_value_pair = []
-    #         for next_move in next_moves:
-    #             # Get forecasting
-    #             next_game, is_over, _ = current_game.forecast_move(next_move)
-    #             # If we are going to over
-    #             if is_over:
-    #                 # current_val = player.eval_fn.score(next_game, player)
-    #                 current_val = player.utility(next_game, True)
-    #             else:
-    #                 current_move, current_val = min_value_alphabeta(next_game, player, d - 1, time_left, alpha, beta)
-    #
-    #             # if current_val is not None and current_move != 'No Time':
-    #             # move_value_pair.append([next_move, current_val])
-    #
-    #             #  if out of running time, return!
-    #             if current_move == 'No Time':
-    #                 return ('No Time', None)
-    #
-    #             # AB pruning
-    #             if best_val < current_val:
-    #                 best_move = next_move
-    #                 best_val = current_val
-    #
-    #             if best_val >= beta:
-    #                 Ordered_Nodes[(current_game.print_board(), 'Max')] = best_move
-    #                 return (best_move, best_val)
-    #
-    #             alpha = max(alpha, best_val)
-    #
-    #         # move_value_pair = sorted(move_value_pair,key = lambda x:x[1],reverse=True)
-    #         # print(move_value_pair)
-    #         # Ordered_Nodes[(current_game.print_board(),'Max')] = [i[0] for i in move_value_pair]
-    #         if best_move is not None:
-    #             Ordered_Nodes[(current_game.print_board(), 'Max')] = best_move
-    #         # print((best_move,best_val),d)
-    #         return (best_move, best_val)
-    #
-    #     def min_value_alphabeta(current_game, player, d, time_left, alpha, beta):
-    #
-    #         nonlocal
-    #         Ordered_Nodes
-    #         best_move = None
-    #         best_val = float('inf')
-    #         current_val = None
-    #         current_move = None
-    #
-    #         if time_left() <= 50:
-    #             return ('No Time', None)
-    #         if d <= 0:
-    #             # return current_game.get_player_position(player),player.eval_fn.score(current_game, player)
-    #             return current_game.get_player_position(player), player.utility(current_game, False)
-    #
-    #         Temp = Ordered_Nodes.get((current_game.print_board(), 'Min'))
-    #         if Temp is None:
-    #             # print('No')
-    #             next_moves = current_game.get_opponent_moves(player)
-    #         else:
-    #             # print('Yes')
-    #             temp = []
-    #             temp.append(Temp)
-    #             temp.extend([i for i in current_game.get_opponent_moves(player) if i != Temp])
-    #             next_moves = temp.copy()
-    #         # next_moves = current_game.get_opponent_moves(player)
-    #
-    #         # move_value_pair = []
-    #         for next_move in next_moves:
-    #
-    #             next_game, is_over, _ = current_game.forecast_move(next_move)
-    #
-    #             if is_over:
-    #                 # current_val = player.eval_fn.score(next_game, player)
-    #                 current_val = player.utility(next_game, True)
-    #                 current_move = next_move
-    #             else:
-    #                 current_move, current_val = max_value_alphabeta(next_game, player, d - 1, time_left, alpha, beta)
-    #
-    #             # if current_val is not None and current_move != 'No Time':
-    #             # move_value_pair.append([next_move, current_val])
-    #
-    #             if current_move == 'No Time':
-    #                 return ('No Time', None)
-    #
-    #             if best_val > current_val:
-    #                 best_move = next_move
-    #                 best_val = current_val
-    #
-    #             if best_val <= alpha:
-    #                 Ordered_Nodes[(current_game.print_board(), 'Min')] = best_move
-    #                 return (best_move, best_val)
-    #             beta = min(beta, best_val)
-    #
-    #         # move_value_pair = sorted(move_value_pair,key = lambda x:x[1])
-    #         # print(move_value_pair)
-    #         if best_move is not None:
-    #             Ordered_Nodes[(current_game.print_board(), 'Min')] = best_move
-    #         # print((best_move,best_val),d)
-    #         return (best_move, best_val)
-    #
-    #     best_move, best_score = max_value_alphabeta(game, player, depth, time_left, alpha, beta)
-    #     return (best_move, best_score, Ordered_Nodes)
-    ##################################################################################################################
+    
+    def helper_advance(self, game, time_left, depth, alpha, beta, my_turn):
+        def max_value_alphabeta(current_game, d, time_left, alpha, beta):
+            
+            # Ordered nodes can store the best strategy for certain situation in previous search
+            
+            time_start = time.time()
+            best_move = None
+            best_val = float('inf')
+            current_val = None
+            current_move = None
+    
+            # Check time left
+            if time_left <= 0.01:
+                return ('No Time', None)
+            # Reach at the maximum nodes
+            if d <= 0:
+                # return current_game.get_player_position(player),player.eval_fn.score(current_game, player)  board game
+                # return the current strategy and evaluation result
+                return 0, 0
+    
+            # Then we can do the next moves which is the next strategies
+            #Temp = Ordered_Nodes.get((current_game.print_board(), 'Max'))  get the best move stored
+            Temp = None
+            if Temp is None:
+                # print('No')
+                next_moves = Generate_Strategies(game)
+            else:
+                # print('Yes')
+                temp = []
+                temp.append(Temp)
+                temp.extend([i for i in Generate_Strategies(game) if i != Temp])
+                next_moves = temp.copy()
+            
+            move_value_pair = []
+            for next_move in next_moves:
+
+		# Update time_left every iteration
+                time_left -=  time.time()-time_start
+                # Get forecasting for the next game and is over
+                next_game, is_over = 0,0
+                # If we are going to over
+                if is_over:
+                    # Judge who is over, if opponent over, then set to +inf, or us over set to -inf
+                    current_val = 0
+                else:
+                    current_move, current_val = min_value_alphabeta(next_game,d - 1, time_left, alpha, beta)
+    
+                # if current_val is not None and current_move != 'No Time':
+                # move_value_pair.append([next_move, current_val])
+    
+                #  if out of running time, return!
+                if current_strategy == 'No Time':
+                    return ('No Time', None)
+    
+                # AB pruning
+                if best_val < current_val:
+                    best_move = next_move
+                    best_val = current_val
+    
+                if best_val >= beta:
+                    # maybe we can store the best strategy
+                    #Ordered_Nodes[(current_game.print_board(), 'Max')] = best_move
+                    return (best_move, best_val)
+    
+                alpha = max(alpha, best_val)
+
+            if best_move is not None:
+                #Ordered_Nodes[(current_game.print_board(), 'Max')] = best_strategy
+                pass
+            # print((best_move,best_val),d)
+            return (best_strategy, best_val)
+    
+        def min_value_alphabeta(current_game, d, time_left, alpha, beta):
+            
+            temp_start = time.time()
+            best_move = None
+            best_val = float('inf')
+            current_val = None
+            current_move = None
+    
+            if time_left <= 0.01:
+                return ('No Time', None)
+            if d <= 0:
+                # return current_game.get_player_position(player),player.eval_fn.score(current_game, player)
+                return 0, 0
+    
+            #Temp = Ordered_Nodes.get((current_game.print_board(), 'Min'))
+            Temp = None
+            if Temp is None:
+                # print('No')
+                #next_moves = current_game.get_opponent_moves(player)
+                next_moves = Generate_Strategies(game)
+            else:
+                # print('Yes')
+                temp = []
+                temp.append(Temp)
+                temp.extend([i for i in Generate_Strategies(game) if i != Temp])
+                next_moves = temp.copy()
+            # next_moves = current_game.get_opponent_moves(player)
+    
+            # move_value_pair = []
+            for next_move in next_moves:
+                
+                time_left -=  time.time()-time_start
+                
+                next_game, is_over = 0,0
+    
+                if is_over:
+                    # current_val = player.eval_fn.score(next_game, player)
+                    current_val = 0
+                    current_move = next_move
+                else:
+                    current_move, current_val = max_value_alphabeta(next_game, d - 1, time_left, alpha, beta)
+    
+                # if current_val is not None and current_move != 'No Time':
+                # move_value_pair.append([next_move, current_val])
+    
+                if current_move == 'No Time':
+                    return ('No Time', None)
+    
+                if best_val > current_val:
+                    best_move = next_move
+                    best_val = current_val
+    
+                if best_val <= alpha:
+                    Ordered_Nodes[(current_game.print_board(), 'Min')] = best_move
+                    return (best_move, best_val)
+                beta = min(beta, best_val)
+
+            if best_move is not None:
+                #Ordered_Nodes[(current_game.print_board(), 'Min')] = best_move
+                pass
+            # print((best_move,best_val),d)
+            return (best_move, best_val)
+    
+        best_move, best_score = max_value_alphabeta(game depth, time_left, alpha, beta)
+        return (best_move, best_score, Ordered_Nodes)
+    #################################################################################################################   
 if __name__ == "__main__":
     algo = AlgoStrategy()
     algo.start()
