@@ -320,7 +320,8 @@ class AlgoStrategy(gamelib.AlgoCore):
             game_state.attempt_spawn(TURRET, build_location)
 
     def eval_def(self,game_state):
-        edge_point =dict.fromkeys([range(-2,29)],0)
+        edge_range = range(-2,30)
+        edge_point =dict.fromkeys(edge_range,0)
         game_dict= json.loads(game_state.serialized_string)
         my_turret = game_dict['p1Units'][2]
         for i in my_turret:
@@ -395,7 +396,9 @@ class AlgoStrategy(gamelib.AlgoCore):
                     edge_point[(13+diff_xy)/2+2]+=up_def
                     edge_point[(13+diff_xy)/2-1]+=up_def
                     edge_point[(13+diff_xy)/2-2]+=up_def
-        return edge_point
+        edge_point_list = list(edge_point.values())[2:-2]
+        #edge_point list is a list of def point start from 0 to 27
+        return edge_point_list
 
 
 
