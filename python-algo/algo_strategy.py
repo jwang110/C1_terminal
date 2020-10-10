@@ -462,12 +462,27 @@ class AlgoStrategy(gamelib.AlgoCore):
                     edge_point[(13+diff_xy)/2+2]+=up_def
                     edge_point[(13+diff_xy)/2-1]+=up_def
                     edge_point[(13+diff_xy)/2-2]+=up_def
-        edge_point_list = list(edge_point.values())[2:-2]
-        #edge_point list is a list of def point start from 0 to 27
-        return edge_point_list
+        del edge_point[-2]
+        del edge_point[-1]
+        del edge_point[28]
+        del edge_point[29]
+        return edge_point
 
+    def get_location_from_x(x_list):
+        location = []
+        for x in x_list:
+            if x<=13:
+                location.append([x,13-x])
+            else:
+                location.append([x,x-14])
+        return location
 
-
+    def interceptors_spawn(self,game_state,number_to_spawn):
+        edge_point = eval_def(game_state)
+        min_def = sorted(edge_point,key = edge_point.get())
+        min_def_index = min_def[0:number_to_spawn]
+        location = get_location_from_x(min_def_index) 
+        game_state.attempt_spawn(INTERCEPTOR,location)
 
 
 
