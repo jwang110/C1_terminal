@@ -65,20 +65,23 @@ class AlgoStrategy(gamelib.AlgoCore):
         game_state.submit_turn()
 
 
-    # def create_strategy_list(self, game_state):
-    #     '''
+    def create_strategy_list(self, game_state):
+        '''
 
-    #     :param game_state:
-    #     :return: list of strategy to be searched
-    #     '''
-    #     self.current_game_map = game_state.game_map.copy()
-    #     self.current_state = game_state.copy()
+        :param game_state:
+        :return: list of strategy to be searched
+        '''
+        self.current_game_map = game_state.game_map.copy()
+        self.current_state = game_state.copy()
 
 
 
-    # def factory_spawn(self, game_state):
-    #     self.current_state.
-    #     pass
+    def factory_spawn(self, game_state):
+        '''
+        :param game_state:
+        :return: a list of possible locations to spawn factory
+        '''
+        game_state.attempt_spawn()
     """
     NOTE: All the methods after this point are part of the sample starter-algo
     strategy and can safely be replaced for your custom algo.
