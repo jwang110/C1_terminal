@@ -187,12 +187,13 @@ class AlgoStrategy(gamelib.AlgoCore):
                 turret_candidate_ = []
                 for new_factory in new_factories:
                     turret_candidate_ += self.find_turret_location(new_factory)
-
-                turret_candidate = list(set(turret_candidate_+TURRET_LOCATIONS))
+                temp = [i for i in TURRET_LOCATIONS if i not in turret_candidate_]
+                turret_candidate_.extend(temp)
+                
                 i = 0
                 j = 0
-                while (i <= n) and (j <= len(TURRET_LOCATIONS)):
-                    candidate = turret_candidate[j]
+                while (i <= n) and (j <= len(turret_candidate_)):
+                    candidate = turret_candidate_[j]
                     if game_state.can_spawn(TURRET, candidate):
                         i += 1
                         current_sp -= 2
@@ -203,7 +204,14 @@ class AlgoStrategy(gamelib.AlgoCore):
                         pass
                     j += 1
         return new_strategies
-
+    def find_turret_location(self, location):
+            '''
+            :param location:
+            :return: two best location to put turret that cover the factories at location
+            '''
+            x = location[0]
+            y = location[1]
+            return [[x+12-y, 12], [x-12+y, 12]]
     def turret_upgrade(self, game_state, strategies):
         '''
 
