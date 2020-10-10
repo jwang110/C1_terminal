@@ -7,7 +7,7 @@ import json
 
 FACTORY_LOCATIONS = [[5, 8], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], [12, 8], [13, 8], [14, 8], [15, 8], [16, 8], [17, 8], [18, 8], [19, 8], [20, 8], [21, 8], [22, 8], [6, 7], [7, 7], [8, 7], [9, 7], [10, 7], [11, 7], [12, 7], [13, 7], [14, 7], [15, 7], [16, 7], [17, 7], [18, 7], [19, 7], [20, 7], [21, 7], [7, 6], [8, 6], [9, 6], [10, 6], [11, 6], [12, 6], [13, 6], [14, 6], [15, 6], [16, 6], [17, 6], [18, 6], [19, 6], [20, 6], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5], [13, 5], [14, 5], [15, 5], [16, 5], [17, 5], [18, 5], [19, 5], [9, 4], [10, 4], [11, 4], [12, 4], [13, 4], [14, 4], [15, 4], [16, 4], [17, 4], [18, 4], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3], [15, 3], [16, 3], [17, 3], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2], [16, 2], [12, 1], [13, 1], [14, 1], [15, 1], [13, 0], [14, 0]].reverse()
 TURRET_LOCATIONS = [[1, 12], [2, 12], [3, 12], [4, 12], [5, 12], [6, 12], [7, 12], [8, 12], [9, 12], [10, 12], [11, 12], [12, 12], [13, 12], [14, 12], [15, 12], [16, 12], [17, 12], [18, 12], [19, 12], [20, 12], [21, 12], [22, 12], [23, 12], [24, 12], [25, 12], [26, 12]]
-
+WALL_LOCATIONS = [[0, 13], [1, 13], [2, 13], [3, 13], [4, 13], [5, 13], [6, 13], [7, 13], [8, 13], [9, 13], [10, 13], [11, 13], [12, 13], [13, 13], [14, 13], [15, 13], [16, 13], [17, 13], [18, 13], [19, 13], [20, 13], [21, 13], [22, 13], [23, 13], [24, 13], [25, 13], [26, 13], [27, 13]]
 
 """
 Most of the algo code you write will be in this file unless you create new
@@ -117,7 +117,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         strategies = []
 
         current_sp = cur_sp
-        current_factories = self.current_serial_string['p1Units'][0]
+        current_factories = self.current_serial_string['p1Units'][1]
         m = len(current_factories)
         res = []
         strategy = {}
@@ -225,12 +225,12 @@ class AlgoStrategy(gamelib.AlgoCore):
             res = []
             strategy['upgrade_turret'] = res.copy()
             new_strategies.append(strategy.copy(), current_sp)
-            current_turrets = self.current_serial_string['p1Units'][0]
+            current_turrets = self.current_serial_string['p1Units'][2]
             m = len(current_turrets)
             res = []
             strategy = {}
-            if current_sp > 2:
-                n = int((current_sp / 2))
+            if current_sp > 4:
+                n = int((current_sp / 4))
                 n = min(n, m)
                 i = 0
                 j = 0
@@ -241,24 +241,84 @@ class AlgoStrategy(gamelib.AlgoCore):
                     i = i + 1
                     if not candidate.upgraded:
                         res.append(candidate)
-                        current_sp -= 2
+                        current_sp -= 4
                         strategy['upgrade_factory'] = res.copy()
                         strategies.append([strategy.copy(), current_sp])
 
         return new_strategies
 
     def wall_spawn(self, game_state, strategies):
+        new_strategies = []
+        for strategy_ in strategies:
+            strategy, current_sp = strategy_
+            res = []
+            strategy['spawn_wall'] = res.copy()
+            new_strategies.append(strategy.copy(), current_sp)
+            new_turrets = strategy['spawn_turret']
+            if current_sp < 1:
+                continue
+            else:
+                n = int(current_sp)
+                wall_candidate_ = []
+                for new_turret in new_turrets:
+                    wall_candidate_ += self.find_wall_location(new_turret)
+                temp = [i for i in WALL_LOCATIONS if i not in wall_candidate_]
+                wall_candidate_.extend(temp)
 
-    def find_turret_location(self, location):
-        '''
-        :param location:
-        :return: two best location to put turret that cover the factories at location
-        '''
-        x = location[0]
-        y = location[1]
-        return [[x+12-y, 12], [x-12+y, 12]]
+                i = 0
+                j = 0
+                while (i <= n) and (j <= len(wall_candidate_)):
+                    candidate = wall_candidate_[j]
+                    if game_state.can_spawn(TURRET, candidate):
+                        i += 1
+                        current_sp -= 1
+                        res.append(candidate)
+                        strategy['spawn_wall'] = res.copy()
+                        new_strategies.append([strategy.copy(), current_sp])
+                    else:
+                        pass
+                    j += 1
+        return new_strategies
+    def wall_upgrade(self, game_state, strategies):
+        new_strategies = []
+        for strategy_ in strategies:
+            strategy, current_sp = strategy_
+            res = []
+            strategy['upgrade_wall'] = res.copy()
+            new_strategies.append(strategy.copy(), current_sp)
+            current_walls = self.current_serial_string['p1Units'][0]
+            m = len(current_walls)
+            res = []
+            strategy = {}
+            if current_sp > 2:
+                n = int((current_sp / 2))
+                n = min(n, m)
+                i = 0
+                j = 0
+                strategy['upgrade_wall'] = res.copy()
+                strategies.append([strategy.copy(), current_sp])
+                while i <= n:
+                    candidate = current_walls[j]
+                    i = i + 1
+                    if not candidate.upgraded:
+                        res.append(candidate)
+                        current_sp -= 2
+                        strategy['upgrade_wall'] = res.copy()
+                        strategies.append([strategy.copy(), current_sp])
 
+        return new_strategies
 
+    # def find_turret_location(self, location):
+    #     '''
+    #     :param location:
+    #     :return: two best location to put turret that cover the factories at location
+    #     '''
+    #     x = location[0]
+    #     y = location[1]
+    #     return [[x+12-y, 12], [x-12+y, 12]]
+    def find_wall_location(self, location):
+        x,y  = location
+        return [[x, y+1]]
     """
     NOTE: All the methods after this point are part of the sample starter-algo
     strategy and can safely be replaced for your custom algo.
