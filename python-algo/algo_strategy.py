@@ -349,8 +349,6 @@ class AlgoStrategy(gamelib.AlgoCore):
 
 
 
-
-
     def stall_with_interceptors(self, game_state):
         """
         Send out interceptors at random locations to defend our base from enemy moving units.
