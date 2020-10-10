@@ -83,9 +83,9 @@ class AlgoStrategy(gamelib.AlgoCore):
         upgrade_turret, current_sp = self.turret_upgrade()
         spawn_wall, current_sp = self.wall_spawn
 
-    def create_strategy(self, game_state, current):
+    # def create_strategy(self, game_state, current):
 
-    def factory_upgrade(self, game_state, cur_sp, strategies):
+    # def factory_upgrade(self, game_state, cur_sp, strategies):
         '''
         :param game_state:
         :return: possible locations to upgrade factory
@@ -177,25 +177,77 @@ class AlgoStrategy(gamelib.AlgoCore):
         for strategy_ in strategies:
             strategy, current_sp = strategy_
             res = []
-            strategy['spawn_factory'] = res.copy()
+            strategy['spawn_turret'] = res.copy()
             new_strategies.append(strategy.copy(), current_sp)
-            if current_sp > 10:
-                n = int((current_sp / 9))
+            new_factories = strategy['spawn_factory']
+            if current_sp < 2:
+                continue
+            else:
+                n = int((current_sp / 2))
+                turret_candidate_ = []
+                for new_factory in new_factories:
+                    turret_candidate_ += self.find_turret_location(new_factory)
+                turret_candidate = list(set(turret_candidate_+TURRET_LOCATIONS))
                 i = 0
                 j = 0
                 while (i <= n) and (j <= len(TURRET_LOCATIONS)):
-                    candidate = TURRET_LOCATIONS[j]
+                    candidate = turret_candidate[j]
                     if game_state.can_spawn(TURRET, candidate):
                         i += 1
                         current_sp -= 2
                         res.append(candidate)
-                        strategy['spawn_factory'] = res.copy()
+                        strategy['spawn_turret'] = res.copy()
                         new_strategies.append([strategy.copy(), current_sp])
                     else:
                         pass
                     j += 1
         return new_strategies
 
+    def turret_upgrade(self, game_state, strategies):
+        '''
+
+        :param game_state:
+        :param strategies:
+        :return:
+        '''
+        new_strategies = []
+        for strategy_ in strategies:
+            strategy, current_sp = strategy_
+            res = []
+            strategy['spawn_turret'] = res.copy()
+            new_strategies.append(strategy.copy(), current_sp)
+            new_factories = strategy['spawn_factory']
+            if current_sp < 4:
+                continue
+            else:
+                n = int((current_sp / 2))
+                turret_candidate_ = []
+                for new_factory in new_factories:
+                    turret_candidate_ += self.find_turret_location(new_factory)
+                turret_candidate = list(set(turret_candidate_ + TURRET_LOCATIONS))
+                i = 0
+                j = 0
+                while (i <= n) and (j <= len(TURRET_LOCATIONS)):
+                    candidate = turret_candidate[j]
+                    if game_state.can_spawn(TURRET, candidate):
+                        i += 1
+                        current_sp -= 2
+                        res.append(candidate)
+                        strategy['spawn_turret'] = res.copy()
+                        new_strategies.append([strategy.copy(), current_sp])
+                    else:
+                        pass
+                    j += 1
+        return new_strategies
+
+    def find_turret_location(self, location):
+        '''
+        :param location:
+        :return: two best location to put turret that cover the factories at location
+        '''
+        x = location[0]
+        y = location[1]
+        return [[x+14-y, 14], [x-14+y, 14]]
 
     """
     NOTE: All the methods after this point are part of the sample starter-algo
