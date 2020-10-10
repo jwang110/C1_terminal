@@ -62,7 +62,6 @@ class AlgoStrategy(gamelib.AlgoCore):
         self.ab_strategy(game_state)
         game_state.submit_turn()
 
-
     def create_strategy_list(self, game_state):
         '''
 
@@ -74,59 +73,127 @@ class AlgoStrategy(gamelib.AlgoCore):
         self.current_serial_string = json.loads(game_state.serialized_string)
         current_sp = self.current_state.get_resource(SP)
         current_mp = self.current_state.get_resource(MP)
+        strategies = []
         strategy = {}
 
-        upgrade_factory, current_sp = self.factory_upgrade(self, game_state, current_sp)
-        spawn_factory, current_sp = self.factory_spawn_locations()
-        upgrade_turret, current_sp = self.turret()
+        strategies = self.factory_upgrade(self, game_state, current_sp)
+        strategies = self.factory_spawn_locations(self, game_state, strategies)
+        strategies = self.turret_spawn(self, game_state, strategies)
+        upgrade_turret, current_sp = self.turret_upgrade()
+        spawn_wall, current_sp = self.wall_spawn
 
+    def create_strategy(self, game_state, current):
 
+    def factory_upgrade(self, game_state, cur_sp, strategies):
+        '''
+        :param game_state:
+        :return: possible locations to upgrade factory
+        '''
+        # strategies = []
+        #
+        # current_sp = cur_sp
+        # current_factories = self.current_serial_string['p1Units'][0]
+        # m = len(current_factories)
+        # res = []
+        # if current_sp > 10:
+        #     n = int((current_sp / 9))
+        #     mean = min(n, m)
+        #     i = 0
+        #     # for i in range(mean):
+        #     #     strategy = {}
+        #     #     candidate = current_factories[i]
+        #     #     if not candidate.upgraded:
+        #     #         res.append(candidate)
+        #     #         current_sp -= 9
+        #     #         strategy['upgrade_factory'] = res
+        # return res, current_sp, strategies
 
     def factory_upgrade(self, game_state, cur_sp):
         '''
         :param game_state:
         :return: possible locations to upgrade factory
         '''
+        strategies = []
+
         current_sp = cur_sp
         current_factories = self.current_serial_string['p1Units'][0]
-        res = {}
+        m = len(current_factories)
+        res = []
+        strategy = {}
         if current_sp > 10:
-            n = int(1 / 2 * (current_sp / 9)) + 1
-            for i in range(n):
+            n = int((current_sp / 9))
+            n = min(n, m)
+            i = 0
+
+            strategy['upgrade_factory'] = res.copy()
+            strategies.append([strategy.copy(), current_sp])
+
+            while i <= n:
                 candidate = current_factories[i]
-                if game_state.can_spawn(FACTORY, candidate):
+                i = i + 1
+                if not candidate.upgraded:
                     res.append(candidate)
                     current_sp -= 9
+                    strategy['upgrade_factory'] = res.copy()
+                    strategies.append([strategy.copy(), current_sp])
+        return strategies.reverse()
 
-        return res, current_sp
-
-
-    def factory_spawn_locations(self, game_state, cur_sp):
+    def factory_spawn_locations(self, game_state, strategies):
         '''
         :param game_state:
         :return: a list of possible locations to spawn factory
         '''
-        current_sp = cur_sp
-        res = []
-        if current_sp > 10:
-            n = int(1/2*(current_sp/9)) + 1
-            for i in range(n):
-                candidate = FACTORY_LOCATIONS[i]
-                if game_state.can_spawn(FACTORY, candidate):
-                    res.append(candidate)
-                    current_sp -= 9
-        return res, current_sp
+        new_strategies = []
+        for strategy_ in strategies:
+            strategy, current_sp = strategy_
+            res = []
+            strategy['spawn_factory'] = res.copy()
+            new_strategies.append(strategy.copy(), current_sp)
+            if current_sp > 10:
+                n = int((current_sp / 9))
+                i = 0
+                j = 0
+                while (i <= n) and (j <= len(FACTORY_LOCATIONS)):
+                    candidate = FACTORY_LOCATIONS[j]
+                    if game_state.can_spawn(FACTORY, candidate):
+                        i += 1
+                        current_sp -= 9
+                        res.append(candidate)
+                        strategy['spawn_factory'] = res.copy()
+                        new_strategies.append([strategy.copy(), current_sp])
+                    else:
+                        pass
+                    j += 1
+        return new_strategies
 
-    def turret(self, game_state, cur_sp):
+    def turret_spawn(self, game_state, strategies):
         '''
-
         :param game_state:
         :param cur_sp:
         :return: locations to upgrade turrets
         '''
-        pass
-
-
+        new_strategies = []
+        for strategy_ in strategies:
+            strategy, current_sp = strategy_
+            res = []
+            strategy['spawn_factory'] = res.copy()
+            new_strategies.append(strategy.copy(), current_sp)
+            if current_sp > 10:
+                n = int((current_sp / 9))
+                i = 0
+                j = 0
+                while (i <= n) and (j <= len(TURRET_LOCATIONS)):
+                    candidate = TURRET_LOCATIONS[j]
+                    if game_state.can_spawn(TURRET, candidate):
+                        i += 1
+                        current_sp -= 2
+                        res.append(candidate)
+                        strategy['spawn_factory'] = res.copy()
+                        new_strategies.append([strategy.copy(), current_sp])
+                    else:
+                        pass
+                    j += 1
+        return new_strategies
 
 
     """
