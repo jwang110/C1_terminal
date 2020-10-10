@@ -137,7 +137,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                     current_sp -= 9
                     strategy['upgrade_factory'] = res.copy()
                     strategies.append([strategy.copy(), current_sp])
-        return strategies.reverse()
+        return strategies
 
     def factory_spawn_locations(self, game_state, strategies):
         '''
@@ -215,34 +215,32 @@ class AlgoStrategy(gamelib.AlgoCore):
         for strategy_ in strategies:
             strategy, current_sp = strategy_
             res = []
-            strategy['spawn_turret'] = res.copy()
+            strategy['upgrade_turret'] = res.copy()
             new_strategies.append(strategy.copy(), current_sp)
-            new_factories = strategy['spawn_factory']
-            if current_sp < 4:
-                continue
-            else:
+            current_turrets = self.current_serial_string['p1Units'][0]
+            m = len(current_turrets)
+            res = []
+            strategy = {}
+            if current_sp > 2:
                 n = int((current_sp / 2))
-                turret_candidate_ = []
-                for new_factory in new_factories:
-                    turret_candidate_ += self.find_turret_location(new_factory)
-                turret_candidate = list(set(turret_candidate_ + TURRET_LOCATIONS))
+                n = min(n, m)
                 i = 0
                 j = 0
-                while (i <= n) and (j <= len(TURRET_LOCATIONS)):
-                    candidate = turret_candidate[j]
-                    if game_state.can_spawn(TURRET, candidate):
-                        i += 1
-                        current_sp -= 2
+                strategy['upgrade_turret'] = res.copy()
+                strategies.append([strategy.copy(), current_sp])
+                while i <= n:
+                    candidate = current_turrets[j]
+                    i = i + 1
+                    if not candidate.upgraded:
                         res.append(candidate)
-                        strategy['spawn_turret'] = res.copy()
-                        new_strategies.append([strategy.copy(), current_sp])
-                    else:
-                        pass
-                    j += 1
+                        current_sp -= 2
+                        strategy['upgrade_factory'] = res.copy()
+                        strategies.append([strategy.copy(), current_sp])
+
         return new_strategies
 
     def wall_spawn(self, game_state, strategies):
-        
+
     def find_turret_location(self, location):
         '''
         :param location:
