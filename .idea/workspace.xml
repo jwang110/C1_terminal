@@ -24,8 +24,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/python-algo/gamelib/game_state.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="6225">
-              <caret line="422" column="53" selection-start-line="422" selection-start-column="45" selection-end-line="422" selection-end-column="53" />
+            <state relative-caret-position="-8238">
+              <caret line="57" column="30" lean-forward="true" selection-start-line="57" selection-start-column="13" selection-end-line="57" selection-end-column="30" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -36,11 +36,20 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/python-algo/algo_strategy.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="434">
-              <caret line="757" column="29" selection-start-line="757" selection-start-column="16" selection-end-line="757" selection-end-column="29" />
+            <state relative-caret-position="362">
+              <caret line="414" column="51" selection-start-line="414" selection-start-column="51" selection-end-line="414" selection-end-column="51" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/json-docs.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="485">
+              <caret line="33" column="31" selection-start-line="33" selection-start-column="26" selection-end-line="33" selection-end-column="31" />
             </state>
           </provider>
         </entry>
@@ -108,6 +117,7 @@
       <find>gamelib.deb</find>
       <find>gamelib.debug_write</find>
       <find>gamelib.debug</find>
+      <find>eval</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -257,6 +267,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24954791" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -278,13 +289,6 @@
     </layout>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/json-docs.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="485">
-          <caret line="33" column="31" selection-start-line="33" selection-start-column="26" selection-end-line="33" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/scripts/run_match.py">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -304,16 +308,6 @@
     <entry file="file://$PROJECT_DIR$/python-algo/gamelib/algocore.py">
       <provider selected="true" editor-type-id="text-editor">
         <state>
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/python-algo/gamelib/game_state.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6225">
-          <caret line="422" column="53" selection-start-line="422" selection-start-column="45" selection-end-line="422" selection-end-column="53" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
@@ -359,10 +353,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/json-docs.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="485">
+          <caret line="33" column="31" selection-start-line="33" selection-start-column="26" selection-end-line="33" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/python-algo/gamelib/game_state.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-8238">
+          <caret line="57" column="30" lean-forward="true" selection-start-line="57" selection-start-column="13" selection-end-line="57" selection-end-column="30" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/python-algo/algo_strategy.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="434">
-          <caret line="757" column="29" selection-start-line="757" selection-start-column="16" selection-end-line="757" selection-end-column="29" />
+        <state relative-caret-position="362">
+          <caret line="414" column="51" selection-start-line="414" selection-start-column="51" selection-end-line="414" selection-end-column="51" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
           </folding>
