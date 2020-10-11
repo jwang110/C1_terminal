@@ -91,9 +91,9 @@ class AlgoStrategy(gamelib.AlgoCore):
         :param game_state:
         :return: list of strategy to be searched
         '''
-        self.current_game_map = deepcopy(game_state.game_map)
-        self.current_state = deepcopy(game_state)
-        self.current_serial_string = deepcopy(json.loads(game_state.serialized_string))
+        self.current_game_map = game_state.game_map
+        self.current_state = game_state
+        self.current_serial_string = json.loads(game_state.serialized_string)
         current_sp = self.current_state.get_resource(SP)
         current_mp = self.current_state.get_resource(MP)
         strategies = []
@@ -106,14 +106,15 @@ class AlgoStrategy(gamelib.AlgoCore):
         strategies = self.wall_spawn(game_state, strategies)
         strategies = self.wall_upgrade(game_state, strategies)
         strategies = self.interceptor_spawn(game_state, current_mp, strategies)
-        strategies = self.demolisher_spawn(game_state, current_mp, strategies)
+        strategies = self.demolisher_spawn(game_state, strategies)
         strategies = self.scout_spawn(game_state, strategies)
         # gamelib.debug_write('The current first strategy is {}'.format(strategies))
+        #gamelib.debug_write(strategies)
         return strategies
 
     def test(self, game_state):
         strategy = self.create_defense_strategy_list(game_state)[-1][0]
-        gamelib.debug_write(strategy)
+        #gamelib.debug_write(strategy)
         if len(strategy['spawn_factory']) != 0:
             game_state.attempt_spawn(FACTORY, strategy['spawn_factory'])
         if len(strategy['spawn_turret']) != 0:
@@ -138,15 +139,19 @@ class AlgoStrategy(gamelib.AlgoCore):
         strategies = []
 
         current_sp = cur_sp
-        # gamelib.debug_write(current_sp)
+        #gamelib.debug_write(current_sp)
         current_factories = self.current_serial_string['p1Units'][1]
         m = len(current_factories)
         res = []
         strategy = {}
+        strategy['upgrade_factory'] = res.copy()
+        strategies.append([strategy.copy(), current_sp])
         if current_sp > 10:
             n = int((current_sp / 9))
+            #gamelib.debug_write(n)
             n = min(n, m)
             i = 0
+            #gamelib.debug_write(n)
             while i < n:
                 candidate_location = current_factories[i][0:2]
                 i = i + 1
@@ -155,11 +160,8 @@ class AlgoStrategy(gamelib.AlgoCore):
                     current_sp -= 9
                     strategy['upgrade_factory'] = res.copy()
                     strategies.append([strategy.copy(), current_sp])
-        else:
-            res = []
-            strategy = {}
-            strategy['upgrade_factory'] = res.copy()
-        # gamelib.debug_write(strategies)
+
+        #gamelib.debug_write(strategies)
         return strategies
 
     def factory_spawn_locations(self, game_state, strategies):
@@ -190,7 +192,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                         pass
                     j += 1
 
-        # gamelib.debug_write(strategies)
+        #gamelib.debug_write(new_strategies)
         return new_strategies
 
     def turret_spawn(self, game_state, strategies):
@@ -204,10 +206,10 @@ class AlgoStrategy(gamelib.AlgoCore):
         for strategy_ in strategies:
             strategy, current_sp = strategy_
             new_factories = strategy['spawn_factory']
+            res = []
+            strategy['spawn_turret'] = res.copy()
+            new_strategies.append([strategy.copy(), current_sp])
             if current_sp < 2:
-                res = []
-                strategy['spawn_turret'] = res.copy()
-                new_strategies.append([strategy.copy(), current_sp])
                 continue
             else:
                 n = int((current_sp / 2))
@@ -230,6 +232,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                     else:
                         pass
                     j += 1
+        #gamelib.debug_write(new_strategies)
         return new_strategies
 
     def find_turret_location(self, location):
@@ -287,7 +290,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         # gamelib.debug_write('5')
         for strategy_ in strategies:
             strategy, current_sp = strategy_
-            gamelib.debug_write(strategy)
+            #gamelib.debug_write(strategy)
             res = []
             strategy['spawn_wall'] = res.copy()
             new_strategies.append([strategy.copy(), current_sp])
@@ -330,7 +333,6 @@ class AlgoStrategy(gamelib.AlgoCore):
             current_walls = self.current_serial_string['p1Units'][0]
             m = len(current_walls)
             res = []
-            strategy = {}
             if current_sp > 2:
                 n = int((current_sp / 2))
                 n = min(n, m)
@@ -582,7 +584,7 @@ class AlgoStrategy(gamelib.AlgoCore):
 
         for strategy_ in strategies:
             strategy, _ = strategy_
-            # gamelib.debug_write(strategy)
+            #gamelib.debug_write(strategy)
 
             res = []
             strategy['spawn_interceptor'] = res.copy()
@@ -591,7 +593,7 @@ class AlgoStrategy(gamelib.AlgoCore):
             if my_mp < 1:
                 continue
             else:
-                new_def = self.get_def_point_by_turret(self, strategy['spawn_turret'], game_state,
+                new_def = self.get_def_point_by_turret(strategy['spawn_turret'], game_state,
                                                        strategy['upgrade_turret'])
                 for i in range(0, 28):
                     new_def[i] = edge_point[i] + new_def[i]
@@ -599,7 +601,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                 curr_mp = my_mp
                 while curr_mp > 0:
                     curr_mp -= 1
-                    min_def_index = sorted(new_def, key=edge_point.get())
+                    min_def_index = sorted(new_def, key=edge_point.get)
                     res.append(self.get_location_from_x([min_def_index[0]])[0])
                     new_def[min_def_index[0]] += inter_add
 
@@ -622,7 +624,7 @@ class AlgoStrategy(gamelib.AlgoCore):
             strategy = {}
             if current_mp > 0:
                 for i in scout_location:
-                    strategy['spawn_scout'] = [i for j in range(current_mp)]
+                    strategy['spawn_scout'] = [i for j in range(int(current_mp))]
                     new_strategies.append([strategy.copy(), 0])
         return new_strategies
 
@@ -633,13 +635,13 @@ class AlgoStrategy(gamelib.AlgoCore):
         for strategy_ in strategies:
             strategy, current_mp = strategy_
             res = []
-            strategy['demolisher_scout'] = res.copy()
+            strategy['spawn_demolisher'] = res.copy()
             new_strategies.append([strategy.copy(), current_mp])
             res = []
             strategy = {}
             if current_mp > 0:
                 for i in demolisher_location:
-                    strategy['spawn_demolisher'] = [i for j in range(current_mp)]
+                    strategy['spawn_demolisher'] = [i for j in range(int(current_mp))]
                     new_strategies.append([strategy.copy(), 0])
         return new_strategies
 
