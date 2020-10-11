@@ -6,10 +6,29 @@ from sys import maxsize
 import json
 from copy import deepcopy
 
-FACTORY_LOCATIONS = [[5, 8], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], [12, 8], [13, 8], [14, 8], [15, 8], [16, 8], [17, 8], [18, 8], [19, 8], [20, 8], [21, 8], [22, 8], [6, 7], [7, 7], [8, 7], [9, 7], [10, 7], [11, 7], [12, 7], [13, 7], [14, 7], [15, 7], [16, 7], [17, 7], [18, 7], [19, 7], [20, 7], [21, 7], [7, 6], [8, 6], [9, 6], [10, 6], [11, 6], [12, 6], [13, 6], [14, 6], [15, 6], [16, 6], [17, 6], [18, 6], [19, 6], [20, 6], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5], [13, 5], [14, 5], [15, 5], [16, 5], [17, 5], [18, 5], [19, 5], [9, 4], [10, 4], [11, 4], [12, 4], [13, 4], [14, 4], [15, 4], [16, 4], [17, 4], [18, 4], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3], [15, 3], [16, 3], [17, 3], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2], [16, 2], [12, 1], [13, 1], [14, 1], [15, 1], [13, 0], [14, 0]]
+# Give a better locations
+FACTORY_LOCATIONS = [[5, 8], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], [12, 8],
+                     [13, 8], [14, 8], [15, 8], [16, 8], [17, 8], [18, 8], [19, 8], [20, 8], [21, 8], [22, 8], [6, 7],
+                     [7, 7], [8, 7],
+                     [9, 7], [10, 7], [11, 7], [12, 7], [13, 7], [14, 7], [15, 7], [16, 7], [17, 7], [18, 7], [19, 7],
+                     [20, 7], [21, 7], [7, 6], [8, 6], [9, 6],
+                     [10, 6], [11, 6], [12, 6], [18, 4], [13, 6], [14, 6], [15, 6], [16, 6], [17, 6], [18, 6], [19, 6],
+                     [20, 6], [8, 5], [9, 5], [10, 5], [11, 5],
+                     [12, 5], [13, 5], [14, 5], [15, 5], [16, 5], [17, 5], [18, 5], [19, 5], [9, 4], [10, 4], [10, 3],
+                     [11, 4], [12, 4], [13, 4], [14, 4], [15, 4],
+                     [16, 4], [16, 2], [17, 4], [11, 3], [12, 3], [13, 3], [14, 3], [15, 3], [16, 3], [17, 3], [11, 2],
+                     [12, 1], [15, 1], [15, 2], [12, 2], [13, 2],
+                     [14, 2], [14, 1], [13, 1], [13, 0], [14, 0]]
 FACTORY_LOCATIONS.reverse()
-TURRET_LOCATIONS = [[1, 12], [2, 12], [3, 12], [4, 12], [5, 12], [6, 12], [7, 12], [8, 12], [9, 12], [10, 12], [11, 12], [12, 12], [13, 12], [14, 12], [15, 12], [16, 12], [17, 12], [18, 12], [19, 12], [20, 12], [21, 12], [22, 12], [23, 12], [24, 12], [25, 12], [26, 12]]
-WALL_LOCATIONS = [[0, 13], [1, 13], [2, 13], [3, 13], [4, 13], [5, 13], [6, 13], [7, 13], [8, 13], [9, 13], [10, 13], [11, 13], [12, 13], [13, 13], [14, 13], [15, 13], [16, 13], [17, 13], [18, 13], [19, 13], [20, 13], [21, 13], [22, 13], [23, 13], [24, 13], [25, 13], [26, 13], [27, 13]]
+TURRET_LOCATIONS = [[1, 12], [2, 12], [3, 12], [4, 12], [5, 12], [6, 12], [7, 12], [8, 12], [9, 12], [10, 12],
+                    [11, 12], [12, 12], [13, 12], [14, 12], [15, 12], [16, 12], [17, 12], [18, 12], [19, 12], [20, 12],
+                    [21, 12],
+                    [22, 12], [23, 12], [24, 12], [25, 12], [26, 12]]
+WALL_LOCATIONS = [[0, 13], [1, 13], [2, 13], [3, 13], [4, 13], [5, 13], [6, 13], [7, 13], [8, 13], [9, 13], [10, 13],
+                  [11, 13],
+                  [12, 13], [13, 13], [14, 13], [15, 13], [16, 13], [17, 13], [18, 13], [19, 13], [20, 13], [21, 13],
+                  [22, 13],
+                  [23, 13], [24, 13], [25, 13], [26, 13], [27, 13]]
 
 """
 Most of the algo code you write will be in this file unless you create new
@@ -24,18 +43,19 @@ Advanced strategy tips:
   the actual current map state.
 """
 
+
 class AlgoStrategy(gamelib.AlgoCore):
     def __init__(self):
         super().__init__()
         seed = random.randrange(maxsize)
         random.seed(seed)
-#        gamelib.debug_write('Random seed: {}'.format(seed))
+        gamelib.debug_write('Random seed: {}'.format(seed))
 
     def on_game_start(self, config):
-        """ 
-        Read in config and perform any initial setup here 
         """
- #       gamelib.debug_write('Configuring your custom algo strategy...')
+        Read in config and perform any initial setup here
+        """
+        gamelib.debug_write('Configuring your custom algo strategy...')
         self.config = config
         global WALL, FACTORY, TURRET, SCOUT, DEMOLISHER, INTERCEPTOR, MP, SP
         WALL = config["unitInformation"][0]["shorthand"]
@@ -58,10 +78,10 @@ class AlgoStrategy(gamelib.AlgoCore):
         game engine.
         """
         game_state = gamelib.GameState(self.config, turn_state)
- #       gamelib.debug_write('Performing turn {} of your custom algo strategy'.format(game_state.turn_number))
-        game_state.suppress_warnings(True)  #Comment or remove this line to enable warnings.
+        gamelib.debug_write('Performing turn {} of your custom algo strategy'.format(game_state.turn_number))
+        game_state.suppress_warnings(True)  # Comment or remove this line to enable warnings.
 
-        #self.starter_strategy(game_state)
+        # self.starter_strategy(game_state)
         self.test(game_state)
         game_state.submit_turn()
 
@@ -86,12 +106,14 @@ class AlgoStrategy(gamelib.AlgoCore):
         strategies = self.wall_spawn(game_state, strategies)
         strategies = self.wall_upgrade(game_state, strategies)
         strategies = self.interceptor_spawn(game_state, current_mp, strategies)
+        strategies = self.demolisher_spawn(game_state, current_mp, strategies)
+        strategies = self.scout_spawn(game_state, strategies)
         # gamelib.debug_write('The current first strategy is {}'.format(strategies))
         return strategies
 
     def test(self, game_state):
         strategy = self.create_defense_strategy_list(game_state)[-1][0]
-#        gamelib.debug_write(strategy)
+        gamelib.debug_write(strategy)
         if len(strategy['spawn_factory']) != 0:
             game_state.attempt_spawn(FACTORY, strategy['spawn_factory'])
         if len(strategy['spawn_turret']) != 0:
@@ -99,8 +121,13 @@ class AlgoStrategy(gamelib.AlgoCore):
         if len(strategy['spawn_wall']) != 0:
             game_state.attempt_spawn(WALL, strategy['spawn_wall'])
         if len(strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory']) != 0:
-            game_state.attempt_upgrade(strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory'])
+            game_state.attempt_upgrade(
+                strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory'])
         if len(strategy['spawn_interceptor']) != 0:
+            game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
+        if len(strategy['spawn_scout']) != 0:
+            game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
+        if len(strategy['spawn_demolisher']) != 0:
             game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
 
     def factory_upgrade(self, game_state, cur_sp):
@@ -111,13 +138,11 @@ class AlgoStrategy(gamelib.AlgoCore):
         strategies = []
 
         current_sp = cur_sp
-        #gamelib.debug_write(current_sp)
+        # gamelib.debug_write(current_sp)
         current_factories = self.current_serial_string['p1Units'][1]
         m = len(current_factories)
         res = []
         strategy = {}
-        strategy['upgrade_factory'] = res.copy()
-        strategies.append([strategy.copy(), current_sp])
         if current_sp > 10:
             n = int((current_sp / 9))
             n = min(n, m)
@@ -130,7 +155,11 @@ class AlgoStrategy(gamelib.AlgoCore):
                     current_sp -= 9
                     strategy['upgrade_factory'] = res.copy()
                     strategies.append([strategy.copy(), current_sp])
-        #gamelib.debug_write(strategies)
+        else:
+            res = []
+            strategy = {}
+            strategy['upgrade_factory'] = res.copy()
+        # gamelib.debug_write(strategies)
         return strategies
 
     def factory_spawn_locations(self, game_state, strategies):
@@ -138,8 +167,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         :param game_state:
         :return: a list of possible locations to spawn factory
         '''
-        #gamelib.debug_write(strategies)
-        # #gamelib.debug_write(strategies)
+
         new_strategies = []
         for strategy_ in strategies:
             strategy, current_sp = strategy_
@@ -161,6 +189,8 @@ class AlgoStrategy(gamelib.AlgoCore):
                     else:
                         pass
                     j += 1
+
+        # gamelib.debug_write(strategies)
         return new_strategies
 
     def turret_spawn(self, game_state, strategies):
@@ -170,14 +200,14 @@ class AlgoStrategy(gamelib.AlgoCore):
         :return: locations to upgrade turrets
         '''
         new_strategies = []
-        #gamelib.debug_write('3')
+        # gamelib.debug_write('3')
         for strategy_ in strategies:
             strategy, current_sp = strategy_
-            res = []
-            strategy['spawn_turret'] = res.copy()
-            new_strategies.append([strategy.copy(), current_sp])
             new_factories = strategy['spawn_factory']
             if current_sp < 2:
+                res = []
+                strategy['spawn_turret'] = res.copy()
+                new_strategies.append([strategy.copy(), current_sp])
                 continue
             else:
                 n = int((current_sp / 2))
@@ -186,7 +216,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                     turret_candidate_ += self.find_turret_location(new_factory)
                 temp = [i for i in TURRET_LOCATIONS if i not in turret_candidate_]
                 turret_candidate_.extend(temp)
-                
+
                 i = 0
                 j = 0
                 while (i < n) and (j < len(turret_candidate_)):
@@ -201,14 +231,16 @@ class AlgoStrategy(gamelib.AlgoCore):
                         pass
                     j += 1
         return new_strategies
+
     def find_turret_location(self, location):
-            '''
-            :param location:
-            :return: two best location to put turret that cover the factories at location
-            '''
-            x = location[0]
-            y = location[1]
-            return [[x+12-y, 12], [x-12+y, 12]]
+        '''
+        :param location:
+        :return: two best location to put turret that cover the factories at location
+        '''
+        x = location[0]
+        y = location[1]
+        return [[x + 12 - y, 12], [x - 12 + y, 12]]
+
     def turret_upgrade(self, game_state, strategies):
         '''
 
@@ -218,17 +250,17 @@ class AlgoStrategy(gamelib.AlgoCore):
         '''
         new_strategies = []
 
-        #gamelib.debug_write(strategies)
+        # gamelib.debug_write(strategies)
         for strategy_ in strategies:
             strategy, current_sp = strategy_
-            #gamelib.debug_write(strategy)
+            # gamelib.debug_write(strategy)
             res = []
             strategy['upgrade_turret'] = res.copy()
             new_strategies.append([strategy.copy(), current_sp])
             current_turrets = self.current_serial_string['p1Units'][2]
-            #gamelib.debug_write(current_turrets)
+            # gamelib.debug_write(current_turrets)
             m = len(current_turrets)
-            #gamelib.debug_write(m)
+            # gamelib.debug_write(m)
             res = []
             if current_sp > 4:
                 n = int((current_sp / 4))
@@ -238,9 +270,9 @@ class AlgoStrategy(gamelib.AlgoCore):
                 while i < n:
                     candidate_location = current_turrets[i][0:2]
                     i = i + 1
-                    #gamelib.debug_write(candidate_location)
-                    #candidate = game_state.game_map[candidate_location[0], candidate_location[1]]
-                    #gamelib.debug_write(candidate)
+                    # gamelib.debug_write(candidate_location)
+                    # candidate = game_state.game_map[candidate_location[0], candidate_location[1]]
+                    # gamelib.debug_write(candidate)
                     if not game_state.game_map[candidate_location[0], candidate_location[1]][0].upgraded:
                         res.append(candidate_location)
                         current_sp -= 4
@@ -251,12 +283,11 @@ class AlgoStrategy(gamelib.AlgoCore):
 
     def wall_spawn(self, game_state, strategies):
         new_strategies = []
-        #gamelib.debug_write(strategies)
-        #gamelib.debug_write('5')
+        # gamelib.debug_write(strategies)
+        # gamelib.debug_write('5')
         for strategy_ in strategies:
             strategy, current_sp = strategy_
-            #gamelib.debug_write(strategy)
- #           gamelib.debug_write(strategy)
+            gamelib.debug_write(strategy)
             res = []
             strategy['spawn_wall'] = res.copy()
             new_strategies.append([strategy.copy(), current_sp])
@@ -285,11 +316,12 @@ class AlgoStrategy(gamelib.AlgoCore):
                         pass
                     j += 1
         return new_strategies
+
     def wall_upgrade(self, game_state, strategies):
         new_strategies = []
         #
 
-        #gamelib.debug_write('6#')
+        # gamelib.debug_write('6#')
         for strategy_ in strategies:
             strategy, current_sp = strategy_
             res = []
@@ -298,6 +330,7 @@ class AlgoStrategy(gamelib.AlgoCore):
             current_walls = self.current_serial_string['p1Units'][0]
             m = len(current_walls)
             res = []
+            strategy = {}
             if current_sp > 2:
                 n = int((current_sp / 2))
                 n = min(n, m)
@@ -324,9 +357,8 @@ class AlgoStrategy(gamelib.AlgoCore):
     #     y = location[1]
     #     return [[x+12-y, 12], [x-12+y, 12]]
     def find_wall_location(self, location):
-        x,y  = location
-        return [[x, y+1]]
-
+        x, y = location
+        return [[x, y + 1]]
 
     def search_greedy_best_strategy(self, game_state, defense_strategies, offense_strategies):
         '''
@@ -350,7 +382,8 @@ class AlgoStrategy(gamelib.AlgoCore):
             if len(strategy['spawn_wall']) != 0:
                 current_game_state.attempt_spawn(WALL, strategy['spawn_wall'])
             if len(strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory']) != 0:
-                current_game_state.attempt_upgrade(strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory'])
+                current_game_state.attempt_upgrade(
+                    strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory'])
             cur_def_score = self.eval_def(current_game_state)
             if cur_def_score > best_defense_score:
                 best_defense_score = cur_def_score
@@ -377,7 +410,6 @@ class AlgoStrategy(gamelib.AlgoCore):
     #
     #     return 0
 
-
     """
     NOTE: All the methods after this point are part of the sample starter-algo
     strategy and can safely be replaced for your custom algo.
@@ -397,20 +429,20 @@ class AlgoStrategy(gamelib.AlgoCore):
 
         # If the turn is less than 5, stall with interceptors and wait to see enemy's base
         if game_state.turn_number < 2:
-            if game_state.turn_number==0:
-                game_state.attempt_spawn(FACTORY,[[13,0],[14,0]])
-                game_state.attempt_spawn(INTERCEPTOR,[[8,5],[12,1],[18,4],[22,8],[27,13]])
-                game_state.attempt_spawn(TURRET,[[4,12]])
-                game_state.attempt_upgrade([[13,0]])
-            if game_state.turn_number==1:
-                if SP<9:
-                    game_state.attempt_spawn(TURRET,[[9,12],[23,12]])
-                    game_state.attempt_spawn(WALL,[[9,13]])
-                if SP>=9:
-                    game_state.attempt_upgrade([[14,0]])
-                    if (SP-9)>=2:
-                        game_state.attempt_spawn(TURRET,[[23,12]])
-                    game_state.attempt_spawn(INTERCEPTOR,[[8,5],[12,1],[18,4],[22,8],[27,13],[0,13]])
+            if game_state.turn_number == 0:
+                game_state.attempt_spawn(FACTORY, [[13, 0], [14, 0]])
+                game_state.attempt_spawn(INTERCEPTOR, [[8, 5], [12, 1], [18, 4], [22, 8], [27, 13]])
+                game_state.attempt_spawn(TURRET, [[4, 12]])
+                game_state.attempt_upgrade([[13, 0]])
+            if game_state.turn_number == 1:
+                if SP < 9:
+                    game_state.attempt_spawn(TURRET, [[9, 12], [23, 12]])
+                    game_state.attempt_spawn(WALL, [[9, 13]])
+                if SP >= 9:
+                    game_state.attempt_upgrade([[14, 0]])
+                    if (SP - 9) >= 2:
+                        game_state.attempt_spawn(TURRET, [[23, 12]])
+                    game_state.attempt_spawn(INTERCEPTOR, [[8, 5], [12, 1], [18, 4], [22, 8], [27, 13], [0, 13]])
         else:
             pass
 
@@ -426,7 +458,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         turret_locations = [[0, 13], [27, 13], [8, 11], [19, 11], [13, 11], [14, 11]]
         # attempt_spawn will try to spawn units if we have resources, and will check if a blocking unit is already there
         game_state.attempt_spawn(TURRET, turret_locations)
-        
+
         # Place walls in front of turrets to soak up damage for them
         wall_locations = [[8, 12], [19, 12]]
         game_state.attempt_spawn(WALL, wall_locations)
@@ -436,183 +468,207 @@ class AlgoStrategy(gamelib.AlgoCore):
     def build_reactive_defense(self, game_state):
         """
         This function builds reactive defenses based on where the enemy scored on us from.
-        We can track where the opponent scored by looking at events in action frames 
+        We can track where the opponent scored by looking at events in action frames
         as shown in the on_action_frame function
         """
         for location in self.scored_on_locations:
             # Build turret one space above so that it doesn't block our own edge spawn locations
-            build_location = [location[0], location[1]+1]
+            build_location = [location[0], location[1] + 1]
             game_state.attempt_spawn(TURRET, build_location)
 
-    def eval_def(self,game_state):
-        game_dict= json.loads(game_state.serialized_string)
+    def eval_def(self, game_state):
+        game_dict = json.loads(game_state.serialized_string)
         my_turret = game_dict['p1Units'][2]
-        edge_point = self.get_def_point_by_turret(my_turret,game_state)
+        edge_point = self.get_def_point_by_turret(my_turret, game_state)
         return edge_point
-    
-    def get_def_point_by_turret(self,my_turret,game_state,upgraded_tur=None):
-        edge_range = range(-2,30)
-        edge_point =dict.fromkeys(edge_range,0)
+
+    def get_def_point_by_turret(self, my_turret, game_state, upgraded_tur=None):
+        edge_range = range(-2, 30)
+        edge_point = dict.fromkeys(edge_range, 0)
         for i in my_turret:
             x = i[0]
             y = i[1]
-            location = [x,y]
-            if upgraded_tur ==None:
-                tur_upgraded = game_state.game_map[location[0],location[1]][0].upgraded
+            location = [x, y]
+            if upgraded_tur == None:
+                tur_upgraded = game_state.game_map[location[0], location[1]][0].upgraded
             else:
                 tur_upgraded = i in upgraded_tur
-#            tur_hp = i[2]
-            check_even=(x+y)%2 == 0
-            sum_xy = x+y
-            diff_xy = x-y
-            normal_def=5
+            check_even = (x + y) % 2 == 0
+            sum_xy = x + y
+            diff_xy = x - y
+            normal_def = 5
             up_def = 15
             if tur_upgraded == False:
-                if check_even==True:
-                    #add def power to right edge
-                    edge_point[(sum_xy+14)/2] += normal_def
-                    edge_point[(sum_xy+14)/2+1] += normal_def
-                    edge_point[(sum_xy+14)/2+2] += normal_def/2
-                    edge_point[(sum_xy+14)/2-1] += normal_def
-                    edge_point[(sum_xy+14)/2-2] += normal_def/2
+                if check_even == True:
+                    # add def power to right edge
+                    edge_point[(sum_xy + 14) / 2] += normal_def
+                    edge_point[(sum_xy + 14) / 2 + 1] += normal_def
+                    edge_point[(sum_xy + 14) / 2 + 2] += normal_def / 2
+                    edge_point[(sum_xy + 14) / 2 - 1] += normal_def
+                    edge_point[(sum_xy + 14) / 2 - 2] += normal_def / 2
 
-                    #add def power to left edge
-                    edge_point[(13+(diff_xy+1))/2]+=normal_def
-                    edge_point[(13+(diff_xy-1))/2]+=normal_def
-                    edge_point[(13+(diff_xy+1))/2+1]+=normal_def
-                    edge_point[(13+(diff_xy-1))/2-1]+=normal_def
+                    # add def power to left edge
+                    edge_point[(13 + (diff_xy + 1)) / 2] += normal_def
+                    edge_point[(13 + (diff_xy - 1)) / 2] += normal_def
+                    edge_point[(13 + (diff_xy + 1)) / 2 + 1] += normal_def
+                    edge_point[(13 + (diff_xy - 1)) / 2 - 1] += normal_def
 
                 else:
-                    #add def power to right edge
-                    edge_point[(sum_xy+1+14)/2]+=normal_def
-                    edge_point[(sum_xy-1+14)/2]+=normal_def
-                    edge_point[(sum_xy+1+14)/2+1]+=normal_def
-                    edge_point[(sum_xy-1+14)/2-1]+=normal_def
+                    # add def power to right edge
+                    edge_point[(sum_xy + 1 + 14) / 2] += normal_def
+                    edge_point[(sum_xy - 1 + 14) / 2] += normal_def
+                    edge_point[(sum_xy + 1 + 14) / 2 + 1] += normal_def
+                    edge_point[(sum_xy - 1 + 14) / 2 - 1] += normal_def
 
-                    #add def power to left edge
-                    edge_point[(13+diff_xy)/2]+=normal_def
-                    edge_point[(13+diff_xy)/2+1]+=normal_def
-                    edge_point[(13+diff_xy)/2+2]+=normal_def/2
-                    edge_point[(13+diff_xy)/2-1]+=normal_def
-                    edge_point[(13+diff_xy)/2-2]+=normal_def/2
+                    # add def power to left edge
+                    edge_point[(13 + diff_xy) / 2] += normal_def
+                    edge_point[(13 + diff_xy) / 2 + 1] += normal_def
+                    edge_point[(13 + diff_xy) / 2 + 2] += normal_def / 2
+                    edge_point[(13 + diff_xy) / 2 - 1] += normal_def
+                    edge_point[(13 + diff_xy) / 2 - 2] += normal_def / 2
             else:
-                #the turret was upgraded
-                if check_even==True:
-                    #add def power to right edge
-                    edge_point[(sum_xy+14)/2] += up_def
-                    edge_point[(sum_xy+14)/2+1] += up_def
-                    edge_point[(sum_xy+14)/2+2] += up_def
-                    edge_point[(sum_xy+14)/2-1] += up_def
-                    edge_point[(sum_xy+14)/2-2] += up_def
+                # the turret was upgraded
+                if check_even == True:
+                    # add def power to right edge
+                    edge_point[(sum_xy + 14) / 2] += up_def
+                    edge_point[(sum_xy + 14) / 2 + 1] += up_def
+                    edge_point[(sum_xy + 14) / 2 + 2] += up_def
+                    edge_point[(sum_xy + 14) / 2 - 1] += up_def
+                    edge_point[(sum_xy + 14) / 2 - 2] += up_def
 
-                    #add def power to left edge
-                    edge_point[(13+(diff_xy+1))/2]+=up_def
-                    edge_point[(13+(diff_xy-1))/2]+=up_def
-                    edge_point[(13+(diff_xy+1))/2+1]+=up_def
-                    edge_point[(13+(diff_xy-1))/2-1]+=up_def
-                    edge_point[(13+(diff_xy+1))/2+2]+=up_def/2
-                    edge_point[(13+(diff_xy-1))/2-2]+=up_def/2
+                    # add def power to left edge
+                    edge_point[(13 + (diff_xy + 1)) / 2] += up_def
+                    edge_point[(13 + (diff_xy - 1)) / 2] += up_def
+                    edge_point[(13 + (diff_xy + 1)) / 2 + 1] += up_def
+                    edge_point[(13 + (diff_xy - 1)) / 2 - 1] += up_def
+                    edge_point[(13 + (diff_xy + 1)) / 2 + 2] += up_def / 2
+                    edge_point[(13 + (diff_xy - 1)) / 2 - 2] += up_def / 2
                 else:
-                    #the turret was upgraded and sum is odd
-                    #add def power to right edge
-                    edge_point[(sum_xy+1+14)/2]+=up_def
-                    edge_point[(sum_xy-1+14)/2]+=up_def
-                    edge_point[(sum_xy+1+14)/2+1]+=up_def
-                    edge_point[(sum_xy-1+14)/2-1]+=up_def
-                    edge_point[(sum_xy+1+14)/2+2]+=up_def/2
-                    edge_point[(sum_xy-1+14)/2-2]+=up_def/2                 
+                    # the turret was upgraded and sum is odd
+                    # add def power to right edge
+                    edge_point[(sum_xy + 1 + 14) / 2] += up_def
+                    edge_point[(sum_xy - 1 + 14) / 2] += up_def
+                    edge_point[(sum_xy + 1 + 14) / 2 + 1] += up_def
+                    edge_point[(sum_xy - 1 + 14) / 2 - 1] += up_def
+                    edge_point[(sum_xy + 1 + 14) / 2 + 2] += up_def / 2
+                    edge_point[(sum_xy - 1 + 14) / 2 - 2] += up_def / 2
 
-                    #add def power to left edge
-                    edge_point[(13+diff_xy)/2]+=up_def
-                    edge_point[(13+diff_xy)/2+1]+=up_def
-                    edge_point[(13+diff_xy)/2+2]+=up_def
-                    edge_point[(13+diff_xy)/2-1]+=up_def
-                    edge_point[(13+diff_xy)/2-2]+=up_def
+                    # add def power to left edge
+                    edge_point[(13 + diff_xy) / 2] += up_def
+                    edge_point[(13 + diff_xy) / 2 + 1] += up_def
+                    edge_point[(13 + diff_xy) / 2 + 2] += up_def
+                    edge_point[(13 + diff_xy) / 2 - 1] += up_def
+                    edge_point[(13 + diff_xy) / 2 - 2] += up_def
         del edge_point[-2]
         del edge_point[-1]
         del edge_point[28]
         del edge_point[29]
         return edge_point
 
-    def get_location_from_x(self,x_list):
+    def get_location_from_x(self, x_list):
         location = []
         for x in x_list:
-            if x<=13:
-                location.append([x,13-x])
+            if x <= 13:
+                location.append([x, 13 - x])
             else:
-                location.append([x,x-14])
+                location.append([x, x - 14])
         return location
 
-    def interceptor_spawn(self,game_state,my_mp,strategies):
-        
+    def interceptor_spawn(self, game_state, my_mp, strategies):
+
         new_strategies = []
         edge_point = self.eval_def(game_state)
         inter_add = 10
-        
+
         for strategy_ in strategies:
             strategy, _ = strategy_
-            #gamelib.debug_write(strategy)
-            
+            # gamelib.debug_write(strategy)
+
             res = []
             strategy['spawn_interceptor'] = res.copy()
             new_strategies.append([strategy.copy(), my_mp])
-            #gamelib.debug_write(strategy)
 
             if my_mp < 1:
                 continue
             else:
-                new_def = self.get_def_point_by_turret(strategy['spawn_turret'], game_state,strategy['upgrade_turret'])
-                for i in range(0,28):
+                new_def = self.get_def_point_by_turret(self, strategy['spawn_turret'], game_state,
+                                                       strategy['upgrade_turret'])
+                for i in range(0, 28):
                     new_def[i] = edge_point[i] + new_def[i]
-                                                    
+
                 curr_mp = my_mp
-                while curr_mp>0:
+                while curr_mp > 0:
                     curr_mp -= 1
-                    min_def_index = sorted(new_def,key = new_def.get)
+                    min_def_index = sorted(new_def, key=edge_point.get())
                     res.append(self.get_location_from_x([min_def_index[0]])[0])
                     new_def[min_def_index[0]] += inter_add
-                    
-                    if len(res)>=5:
+
+                    if len(res) >= 5:
                         strategy['spawn_interceptor'] = res.copy()
-                        new_strategies.append([strategy.copy(), curr_mp])     
-        #gamelib.debug_write(len(new_strategies))
-        #gamelib.debug_write(len(new_strategies))
-        #gamelib.debug_write(len(new_strategies))
-        #gamelib.debug_write(len(new_strategies))
-        #gamelib.debug_write(len(new_strategies))
+                        new_strategies.append([strategy.copy(), curr_mp])
         return new_strategies
 
+    def scout_spawn(self, game_state, strategies):
+        # Start from the bottom
+        scout_location = [[i, i + 13] for i in range(14)] + [[i, i - 14] for i in range(14, 28)]
+        new_strategies = []
 
+        for strategy_ in strategies:
+            strategy, current_mp = strategy_
+            res = []
+            strategy['spawn_scout'] = res.copy()
+            new_strategies.append([strategy.copy(), current_mp])
+            res = []
+            strategy = {}
+            if current_mp > 0:
+                for i in scout_location:
+                    strategy['spawn_scout'] = [i for j in range(current_mp)]
+                    new_strategies.append([strategy.copy(), 0])
+        return new_strategies
 
-    def eval_off(self,game_state):
-        game_dict= json.loads(game_state.serialized_string)
+    def demolisher_spawn(self, game_state, strategies):
+        demolisher_location = [[i, i + 13] for i in range(14)] + [[i, i - 14] for i in range(14, 28)]
+        new_strategies = []
+
+        for strategy_ in strategies:
+            strategy, current_mp = strategy_
+            res = []
+            strategy['demolisher_scout'] = res.copy()
+            new_strategies.append([strategy.copy(), current_mp])
+            res = []
+            strategy = {}
+            if current_mp > 0:
+                for i in demolisher_location:
+                    strategy['spawn_demolisher'] = [i for j in range(current_mp)]
+                    new_strategies.append([strategy.copy(), 0])
+        return new_strategies
+
+    def eval_off(self, game_state):
+        game_dict = json.loads(game_state.serialized_string)
         oppo_turret = game_dict['p2Units'][2]
         for i in oppo_turret:
-            i[1] = 27-i[1]
-        edge_point = self.get_def_point_by_turret(oppo_turret,game_state)
+            i[1] = 27 - i[1]
+        edge_point = self.get_def_point_by_turret(oppo_turret, game_state)
         return edge_point
-
-
-
-
 
     def stall_with_interceptors(self, game_state):
         """
         Send out interceptors at random locations to defend our base from enemy moving units.
         """
         # We can spawn moving units on our edges so a list of all our edge locations
-        friendly_edges = game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_LEFT) + game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_RIGHT)
-        
-        # Remove locations that are blocked by our own structures 
+        friendly_edges = game_state.game_map.get_edge_locations(
+            game_state.game_map.BOTTOM_LEFT) + game_state.game_map.get_edge_locations(game_state.game_map.BOTTOM_RIGHT)
+
+        # Remove locations that are blocked by our own structures
         # since we can't deploy units there.
         deploy_locations = self.filter_blocked_locations(friendly_edges, game_state)
-        
+
         # While we have remaining MP to spend lets send out interceptors randomly.
         while game_state.get_resource(MP) >= game_state.type_cost(INTERCEPTOR)[MP] and len(deploy_locations) > 0:
             # Choose a random deploy location.
             deploy_index = random.randint(0, len(deploy_locations) - 1)
             deploy_location = deploy_locations[deploy_index]
-            
+
             game_state.attempt_spawn(INTERCEPTOR, deploy_location)
             """
             We don't have to remove the location since multiple mobile 
@@ -644,7 +700,7 @@ class AlgoStrategy(gamelib.AlgoCore):
     def least_damage_spawn_location(self, game_state, location_options):
         """
         This function will help us guess which location is the safest to spawn moving units from.
-        It gets the path the unit will take then checks locations on that path to 
+        It gets the path the unit will take then checks locations on that path to
         estimate the path's damage risk.
         """
         damages = []
@@ -654,21 +710,23 @@ class AlgoStrategy(gamelib.AlgoCore):
             damage = 0
             for path_location in path:
                 # Get number of enemy turrets that can attack each location and multiply by turret damage
-                damage += len(game_state.get_attackers(path_location, 0)) * gamelib.GameUnit(TURRET, game_state.config).damage_i
+                damage += len(game_state.get_attackers(path_location, 0)) * gamelib.GameUnit(TURRET,
+                                                                                             game_state.config).damage_i
             damages.append(damage)
-        
+
         # Now just return the location that takes the least damage
         return location_options[damages.index(min(damages))]
 
-    def detect_enemy_unit(self, game_state, unit_type=None, valid_x = None, valid_y = None):
+    def detect_enemy_unit(self, game_state, unit_type=None, valid_x=None, valid_y=None):
         total_units = 0
         for location in game_state.game_map:
             if game_state.contains_stationary_unit(location):
                 for unit in game_state.game_map[location]:
-                    if unit.player_index == 1 and (unit_type is None or unit.unit_type == unit_type) and (valid_x is None or location[0] in valid_x) and (valid_y is None or location[1] in valid_y):
+                    if unit.player_index == 1 and (unit_type is None or unit.unit_type == unit_type) and (
+                            valid_x is None or location[0] in valid_x) and (valid_y is None or location[1] in valid_y):
                         total_units += 1
         return total_units
-        
+
     def filter_blocked_locations(self, locations, game_state):
         filtered = []
         for location in locations:
@@ -678,7 +736,7 @@ class AlgoStrategy(gamelib.AlgoCore):
 
     def on_action_frame(self, turn_string):
         """
-        This is the action frame of the game. This function could be called 
+        This is the action frame of the game. This function could be called
         hundreds of times per turn and could slow the algo down so avoid putting slow code here.
         Processing the action frames is complicated so we only suggest it if you have time and experience.
         Full doc on format of a game frame at in json-docs.html in the root of the Starterkit.
@@ -690,201 +748,14 @@ class AlgoStrategy(gamelib.AlgoCore):
         for breach in breaches:
             location = breach[0]
             unit_owner_self = True if breach[4] == 1 else False
-            # When parsing the frame data directly, 
+            # When parsing the frame data directly,
             # 1 is integer for yourself, 2 is opponent (StarterKit code uses 0, 1 as player_index instead)
             if not unit_owner_self:
-#                gamelib.debug_write("Got scored on at: {}".format(location))
+                gamelib.debug_write("Got scored on at: {}".format(location))
                 self.scored_on_locations.append(location)
- #               gamelib.debug_write("All locations: {}".format(self.scored_on_locations))
+                gamelib.debug_write("All locations: {}".format(self.scored_on_locations))
 
-    # ################################################################################################################
-    # def ab_strategy_result(self,game_state):
-    #
-	# # Give 4 seconds, max depth = 20
-    #     time_left = 4.0
-    #     depth = 20
-    #
-	# # IDAB Search for best strategy
-    #     strategy,_ = self.id_alphabeta_advance(game_state, time_left, depth)
-    #     # given strategy
-    #     game_state.attempt_spawn(FACTORY,strategy['FACTORY'])
-    #     game_state.attempt_spawn(INTERCEPTOR,strategy['INTERCEPTOR'])
-    #     game_state.attempt_spawn(TURRET,strategy['TURRET'])
-    #     game_state.attempt_spawn(SCOUT ,strategy['SCOUT'])
-    #     game_state.attempt_spawn(WALL,strategy['WALL'])
-    #     game_state.attempt_spawn(DEMOLISHER,strategy['DEMOLISHER'])
-    #     game_state.attempt_upgrade(strategy['UPGRADE'])
-    #
-    #
-    # def id_alphabeta_advance(self, game, time_left, depth, alpha=float("-inf"), beta=float("inf"), my_turn=True):
-	# # game is the game_state
-	# # time_left control time
-	# # Iterate over given max depth
-	#
-    #     # current_strategy and current_val is just used to prevent losing Memory of Previous best and can check time out easily
-	# # We can use the global Ordered_Nodes here to help us store more and save time
-    #     best_strategy, best_val, current_strategy, current_val = None, None, None, None
-    #     time_start = time.time()
-    #
-    #     # We evaluate the results only at 2 turns finished
-    #     for i in range(2, depth, 2):
-    #         time_left = time.time()-time_start
-    #         if time_left <= 0.01:
-    #             print((best_strategy, best_val))
-    #             return (best_strategy, best_val)
-    #         current_strategy, current_val = self.helper_advance(game, time_left, i, alpha, beta, True)
-    #         # print(i,current_strategy,current_val)
-    #         # Update it or directly return
-    #         if current_strategy != 'No Time':
-    #             best_strategy, best_val = current_strategy, current_val
-    #         else:
-    #             # print(Ordered_Nodes)
-    #             # print('No time left!! at depth',i)
-    #             print((best_strategy, best_val))
-    #             return (best_strategy, best_val)
-    #     print((best_strategy, best_val))
-    #     # print(Ordered_Nodes)
-    #     return (best_strategy, best_val)
-    # #
-    #
-    # def helper_advance(self, game, time_left, depth, alpha, beta, my_turn):
-    #     def max_value_alphabeta(current_game, d, time_left, alpha, beta):
-    #
-    #         # Ordered nodes can store the best strategy for certain situation in previous search
-    #
-    #         time_start = time.time()
-    #         best_move = None
-    #         best_val = float('inf')
-    #         current_val = None
-    #         current_move = None
-    #
-    #         # Check time left
-    #         if time_left <= 0.01:
-    #             return ('No Time', None)
-    #         # Reach at the maximum nodes
-    #         if d <= 0:
-    #             # return current_game.get_player_position(player),player.eval_fn.score(current_game, player)  board game
-    #             # return the current strategy and evaluation result
-    #             return 0, 0
-    #
-    #         # Then we can do the next moves which is the next strategies
-    #         #Temp = Ordered_Nodes.get((current_game.print_board(), 'Max'))  get the best move stored
-    #         Temp = None
-    #         if Temp is None:
-    #             # print('No')
-    #             next_moves = Generate_Strategies(game)
-    #         else:
-    #             # print('Yes')
-    #             temp = []
-    #             temp.append(Temp)
-    #             temp.extend([i for i in Generate_Strategies(game) if i != Temp])
-    #             next_moves = temp.copy()
-    #
-    #         move_value_pair = []
-    #         for next_move in next_moves:
-    #
-	# 	# Update time_left every iteration
-    #             time_left -=  time.time()-time_start
-    #             # Get forecasting for the next game and is over
-    #             next_game, is_over = 0,0
-    #             # If we are going to over
-    #             if is_over:
-    #                 # Judge who is over, if opponent over, then set to +inf, or us over set to -inf
-    #                 current_val = 0
-    #             else:
-    #                 current_move, current_val = min_value_alphabeta(next_game,d - 1, time_left, alpha, beta)
-    #
-    #             # if current_val is not None and current_move != 'No Time':
-    #             # move_value_pair.append([next_move, current_val])
-    #
-    #             #  if out of running time, return!
-    #             if current_strategy == 'No Time':
-    #                 return ('No Time', None)
-    #
-    #             # AB pruning
-    #             if best_val < current_val:
-    #                 best_move = next_move
-    #                 best_val = current_val
-    #
-    #             if best_val >= beta:
-    #                 # maybe we can store the best strategy
-    #                 #Ordered_Nodes[(current_game.print_board(), 'Max')] = best_move
-    #                 return (best_move, best_val)
-    #
-    #             alpha = max(alpha, best_val)
-    #
-    #         if best_move is not None:
-    #             #Ordered_Nodes[(current_game.print_board(), 'Max')] = best_strategy
-    #             pass
-    #         # print((best_move,best_val),d)
-    #         return (best_strategy, best_val)
-    #
-    #     def min_value_alphabeta(current_game, d, time_left, alpha, beta):
-    #
-    #         temp_start = time.time()
-    #         best_move = None
-    #         best_val = float('inf')
-    #         current_val = None
-    #         current_move = None
-    #
-    #         if time_left <= 0.01:
-    #             return ('No Time', None)
-    #         if d <= 0:
-    #             # return current_game.get_player_position(player),player.eval_fn.score(current_game, player)
-    #             return 0, 0
-    #
-    #         #Temp = Ordered_Nodes.get((current_game.print_board(), 'Min'))
-    #         Temp = None
-    #         if Temp is None:
-    #             # print('No')
-    #             #next_moves = current_game.get_opponent_moves(player)
-    #             next_moves = Generate_Strategies(game)
-    #         else:
-    #             # print('Yes')
-    #             temp = []
-    #             temp.append(Temp)
-    #             temp.extend([i for i in Generate_Strategies(game) if i != Temp])
-    #             next_moves = temp.copy()
-    #         # next_moves = current_game.get_opponent_moves(player)
-    #
-    #         # move_value_pair = []
-    #         for next_move in next_moves:
-    #
-    #             time_left -=  time.time()-time_start
-    #
-    #             next_game, is_over = 0,0
-    #
-    #             if is_over:
-    #                 # current_val = player.eval_fn.score(next_game, player)
-    #                 current_val = 0
-    #                 current_move = next_move
-    #             else:
-    #                 current_move, current_val = max_value_alphabeta(next_game, d - 1, time_left, alpha, beta)
-    #
-    #             # if current_val is not None and current_move != 'No Time':
-    #             # move_value_pair.append([next_move, current_val])
-    #
-    #             if current_move == 'No Time':
-    #                 return ('No Time', None)
-    #
-    #             if best_val > current_val:
-    #                 best_move = next_move
-    #                 best_val = current_val
-    #
-    #             if best_val <= alpha:
-    #                 Ordered_Nodes[(current_game.print_board(), 'Min')] = best_move
-    #                 return (best_move, best_val)
-    #             beta = min(beta, best_val)
-    #
-    #         if best_move is not None:
-    #             #Ordered_Nodes[(current_game.print_board(), 'Min')] = best_move
-    #             pass
-    #         # print((best_move,best_val),d)
-    #         return (best_move, best_val)
-    #
-    #     best_move, best_score = max_value_alphabeta(game depth, time_left, alpha, beta)
-    #     return (best_move, best_score, Ordered_Nodes)
-    #################################################################################################################   
+
 if __name__ == "__main__":
     algo = AlgoStrategy()
     algo.start()
