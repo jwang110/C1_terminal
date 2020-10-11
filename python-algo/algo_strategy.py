@@ -573,7 +573,12 @@ class AlgoStrategy(gamelib.AlgoCore):
                     
                     if len(res)>=5:
                         strategy['spawn_interceptor'] = res.copy()
-                        new_strategies.append([strategy.copy(), curr_mp])                    
+                        new_strategies.append([strategy.copy(), curr_mp])     
+        gamelib.debug_write(len(new_strategies))  
+        gamelib.debug_write(len(new_strategies)) 
+        gamelib.debug_write(len(new_strategies)) 
+        gamelib.debug_write(len(new_strategies)) 
+        gamelib.debug_write(len(new_strategies))            
         return new_strategies
 
 
