@@ -138,11 +138,8 @@ class AlgoStrategy(gamelib.AlgoCore):
         :param game_state:
         :return: a list of possible locations to spawn factory
         '''
-<<<<<<< HEAD
         #gamelib.debug_write(strategies)
-=======
- #       gamelib.debug_write(strategies)
->>>>>>> 10e37a596e57a59b91f7510096b0a7ff5e41b3c5
+        # #gamelib.debug_write(strategies)
         new_strategies = []
         for strategy_ in strategies:
             strategy, current_sp = strategy_
@@ -258,11 +255,8 @@ class AlgoStrategy(gamelib.AlgoCore):
         #gamelib.debug_write('5')
         for strategy_ in strategies:
             strategy, current_sp = strategy_
-<<<<<<< HEAD
             #gamelib.debug_write(strategy)
-=======
  #           gamelib.debug_write(strategy)
->>>>>>> 10e37a596e57a59b91f7510096b0a7ff5e41b3c5
             res = []
             strategy['spawn_wall'] = res.copy()
             new_strategies.append([strategy.copy(), current_sp])
@@ -304,7 +298,6 @@ class AlgoStrategy(gamelib.AlgoCore):
             current_walls = self.current_serial_string['p1Units'][0]
             m = len(current_walls)
             res = []
-            strategy = {}
             if current_sp > 2:
                 n = int((current_sp / 2))
                 n = min(n, m)
@@ -563,12 +556,12 @@ class AlgoStrategy(gamelib.AlgoCore):
             res = []
             strategy['spawn_interceptor'] = res.copy()
             new_strategies.append([strategy.copy(), my_mp])
-            
+            #gamelib.debug_write(strategy)
 
             if my_mp < 1:
                 continue
             else:
-                new_def = self.get_def_point_by_turret(strategy['spawn_turret'],game_state,strategy['upgrade_turret'])
+                new_def = self.get_def_point_by_turret(strategy['spawn_turret'], game_state,strategy['upgrade_turret'])
                 for i in range(0,28):
                     new_def[i] = edge_point[i] + new_def[i]
                                                     
@@ -582,11 +575,11 @@ class AlgoStrategy(gamelib.AlgoCore):
                     if len(res)>=5:
                         strategy['spawn_interceptor'] = res.copy()
                         new_strategies.append([strategy.copy(), curr_mp])     
-        gamelib.debug_write(len(new_strategies))  
-        gamelib.debug_write(len(new_strategies)) 
-        gamelib.debug_write(len(new_strategies)) 
-        gamelib.debug_write(len(new_strategies)) 
-        gamelib.debug_write(len(new_strategies))            
+        #gamelib.debug_write(len(new_strategies))
+        #gamelib.debug_write(len(new_strategies))
+        #gamelib.debug_write(len(new_strategies))
+        #gamelib.debug_write(len(new_strategies))
+        #gamelib.debug_write(len(new_strategies))
         return new_strategies
 
 
