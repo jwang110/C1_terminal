@@ -133,7 +133,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         strategies = []
 
         current_sp = cur_sp
-        gamelib.debug_write(current_sp)
+        #gamelib.debug_write(current_sp)
         current_factories = self.current_serial_string['p1Units'][1]
         m = len(current_factories)
         res = []
@@ -145,14 +145,14 @@ class AlgoStrategy(gamelib.AlgoCore):
             n = min(n, m)
             i = 0
             while i < n:
-                candidate = current_factories[i]
+                candidate_location = current_factories[i][0:2]
                 i = i + 1
-                if not candidate.upgraded:
-                    res.append(candidate)
+                if not game_state.game_map[candidate_location[0], candidate_location[1]][0].upgraded:
+                    res.append(candidate_location)
                     current_sp -= 9
                     strategy['upgrade_factory'] = res.copy()
                     strategies.append([strategy.copy(), current_sp])
-        gamelib.debug_write(strategies)
+        #gamelib.debug_write(strategies)
         return strategies
 
     def factory_spawn_locations(self, game_state, strategies):
@@ -160,7 +160,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         :param game_state:
         :return: a list of possible locations to spawn factory
         '''
-        gamelib.debug_write('2')
+        gamelib.debug_write(strategies)
         new_strategies = []
         for strategy_ in strategies:
             strategy, current_sp = strategy_
@@ -191,7 +191,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         :return: locations to upgrade turrets
         '''
         new_strategies = []
-        gamelib.debug_write('3')
+        #gamelib.debug_write('3')
         for strategy_ in strategies:
             strategy, current_sp = strategy_
             res = []
@@ -247,21 +247,23 @@ class AlgoStrategy(gamelib.AlgoCore):
             strategy['upgrade_turret'] = res.copy()
             new_strategies.append([strategy.copy(), current_sp])
             current_turrets = self.current_serial_string['p1Units'][2]
+            #gamelib.debug_write(current_turrets)
             m = len(current_turrets)
             #gamelib.debug_write(m)
             res = []
-            strategy = {}
             if current_sp > 4:
                 n = int((current_sp / 4))
                 n = min(n, m)
                 i = 0
                 j = 0
                 while i < n:
-                    candidate = current_turrets[i]
+                    candidate_location = current_turrets[i][0:2]
                     i = i + 1
-                    gamelib.debug_write(i)
-                    if not candidate.upgraded:
-                        res.append(candidate)
+                    #gamelib.debug_write(candidate_location)
+                   # candidate = game_state.game_map[candidate_location[0], candidate_location[1]]
+                    #gamelib.debug_write(candidate)
+                    if not game_state.game_map[candidate_location[0], candidate_location[1]][0].upgraded:
+                        res.append(candidate_location)
                         current_sp -= 4
                         strategy['upgrade_turret'] = res.copy()
                         new_strategies.append([strategy.copy(), current_sp])
@@ -270,9 +272,11 @@ class AlgoStrategy(gamelib.AlgoCore):
 
     def wall_spawn(self, game_state, strategies):
         new_strategies = []
-        gamelib.debug_write('5')
+        #gamelib.debug_write(strategies)
+        #gamelib.debug_write('5')
         for strategy_ in strategies:
             strategy, current_sp = strategy_
+            gamelib.debug_write(strategy)
             res = []
             strategy['spawn_wall'] = res.copy()
             new_strategies.append([strategy.copy(), current_sp])
@@ -303,7 +307,9 @@ class AlgoStrategy(gamelib.AlgoCore):
         return new_strategies
     def wall_upgrade(self, game_state, strategies):
         new_strategies = []
-        gamelib.debug_write('6')
+        #
+
+        #gamelib.debug_write('6#')
         for strategy_ in strategies:
             strategy, current_sp = strategy_
             res = []
@@ -320,10 +326,10 @@ class AlgoStrategy(gamelib.AlgoCore):
                 j = 0
 
                 while i < n:
-                    candidate = current_walls[j]
+                    candidate_location = current_walls[j][0:2]
                     i = i + 1
-                    if not candidate.upgraded:
-                        res.append(candidate)
+                    if not game_state.game_map[candidate_location[0], candidate_location[1]][0].upgraded:
+                        res.append(candidate_location)
                         current_sp -= 2
                         strategy['upgrade_wall'] = res.copy()
                         new_strategies.append([strategy.copy(), current_sp])
