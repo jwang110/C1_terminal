@@ -131,7 +131,7 @@ class AlgoStrategy(gamelib.AlgoCore):
             game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
         if len(strategy['spawn_demolisher']) != 0:
             game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
-        #gamelib.debug_write(self.search_greedy_best_strategy(game_state, self.create_defense_strategy_list(game_state)))
+        gamelib.debug_write(self.search_greedy_best_strategy(game_state, self.create_defense_strategy_list(game_state)))
 
 
     def factory_upgrade(self, game_state, cur_sp):
@@ -380,22 +380,22 @@ class AlgoStrategy(gamelib.AlgoCore):
             #current_frame_state = deepcopy(self.current_serial_string)
             current_game_map = deepcopy(self.current_game_map)
             strategy, current_sp = strategy_
-            if len(strategy['spawn_factory']) != 0:
-                current_game_state.attempt_spawn(FACTORY, strategy['spawn_factory'])
-            if len(strategy['spawn_turret']) != 0:
-                current_game_state.attempt_spawn(TURRET, strategy['spawn_turret'])
-            if len(strategy['spawn_wall']) != 0:
-                current_game_state.attempt_spawn(WALL, strategy['spawn_wall'])
-            if len(strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory']) != 0:
-                current_game_state.attempt_upgrade(
-                    strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory'])
-            if len(strategy['spawn_interceptor']) != 0:
-                game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
-            if len(strategy['spawn_scout']) != 0:
-                game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
-            if len(strategy['spawn_demolisher']) != 0:
-                game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
-            gamelib.debug_write
+            self.update_game_map(current_game_state, strategy)
+            # if len(strategy['spawn_factory']) != 0:
+            #     current_game_state.attempt_spawn(FACTORY, strategy['spawn_factory'])
+            # if len(strategy['spawn_turret']) != 0:
+            #     current_game_state.attempt_spawn(TURRET, strategy['spawn_turret'])
+            # if len(strategy['spawn_wall']) != 0:
+            #     current_game_state.attempt_spawn(WALL, strategy['spawn_wall'])
+            # if len(strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory']) != 0:
+            #     current_game_state.attempt_upgrade(
+            #         strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory'])
+            # if len(strategy['spawn_interceptor']) != 0:
+            #     game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
+            # if len(strategy['spawn_scout']) != 0:
+            #     game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
+            # if len(strategy['spawn_demolisher']) != 0:
+            #     game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
             gamelib.debug_write(current_game_state.serialized_string == self.current_state.serialized_string)
             #gamelib.debug_write(current_game_state.game_map[13, 0])
             cur_def_score = self.evaluate_defense(current_game_state) + self.evaluate_offense(current_game_state)
@@ -404,6 +404,26 @@ class AlgoStrategy(gamelib.AlgoCore):
                 best_defense = strategy
 
         return best_strategy
+
+    def update_game_map(self, game_state, strategy):
+        '''
+
+        :param game_state:
+        :param strategy:
+        :return:
+        '''
+        for factory_location in strategy['spawn_factory']:
+            game_state.game_map.add_unit(FACTORY, factory_location)
+        for turret_location in strategy['spawn_turret']:
+            game_state.game_map.add_unit(FACTORY, turret_location)
+        for wall_location in strategy['spawn_wall']:
+            game_state.game_map.add_unit(FACTORY, wall_location)
+        for factory_location in strategy['upgrade_factory']:
+            game_state.game_map[factory_location[0], factory_location[1]].upgrade()
+        for turret_location in strategy['upgrade_turret']:
+            game_state.game_map[turret_location[0], turret_location[1]].upgrade()
+        for wall_location in strategy['upgrade_factory']:
+            game_state.game_map[wall_location[0], wall_location[1]].upgrade()
 
     def evaluate_offense(self, game_state, strategy):
         '''
