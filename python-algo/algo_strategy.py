@@ -5,7 +5,8 @@ import warnings
 from sys import maxsize
 import json
 from copy import deepcopy
-
+import time
+from gamelib.game_state import GameState
 # Give a better locations
 FACTORY_LOCATIONS = [[5, 8], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], [12, 8],
                      [13, 8], [14, 8], [15, 8], [16, 8], [17, 8], [18, 8], [19, 8], [20, 8], [21, 8], [22, 8], [6, 7],
@@ -376,11 +377,13 @@ class AlgoStrategy(gamelib.AlgoCore):
         for strategy_ in strategies:
             current_game_state = deepcopy(self.current_state)
             #gamelib.debug_write(current_game_state.game_map[13,0])
-            gamelib.debug_write(current_game_state.serialized_string)
+            #gamelib.debug_write(current_game_state.serialized_string)
             #current_frame_state = deepcopy(self.current_serial_string)
             current_game_map = deepcopy(self.current_game_map)
             strategy, current_sp = strategy_
-            self.update_game_map(current_game_state, strategy)
+            #gamelib.debug_write(current_game_state.serialized_string)
+            current_game_state = self.update_game_map(current_game_state, strategy)
+
             # if len(strategy['spawn_factory']) != 0:
             #     current_game_state.attempt_spawn(FACTORY, strategy['spawn_factory'])
             # if len(strategy['spawn_turret']) != 0:
@@ -396,8 +399,12 @@ class AlgoStrategy(gamelib.AlgoCore):
             #     game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
             # if len(strategy['spawn_demolisher']) != 0:
             #     game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
-            gamelib.debug_write(current_game_state.serialized_string == self.current_state.serialized_string)
-            #gamelib.debug_write(current_game_state.game_map[13, 0])
+            # for [x, y] in TURRET_LOCATIONS:
+            #     if current_game_state.game_map[x, y] != self.current_state.game_map[x,y]:
+            #         gamelib.debug_write(current_game_state.game_map[x, y][0])
+            #         gamelib.debug_write(self.current_state.game_map[x, y])
+
+            #gamelib.debug_write(self.current_state.serialized_string == current_game_state.serialized_string)
             cur_def_score = self.evaluate_defense(current_game_state) + self.evaluate_offense(current_game_state)
             if cur_def_score > best_score:
                 best_defense_score = cur_def_score
@@ -412,27 +419,34 @@ class AlgoStrategy(gamelib.AlgoCore):
         :param strategy:
         :return:
         '''
+        gamelib.debug_write(game_state.serialized_string)
+        serialized_string = json.loads(game_state.serialized_string)
+        #gamelib.debug_write(serialized_string)
         for factory_location in strategy['spawn_factory']:
-            game_state.game_map.add_unit(FACTORY, factory_location)
+            serialized_string['p1Units'][1].append([factory_location[0], factory_location[1], 30, str(random.randint(1000, 10000))])
         for turret_location in strategy['spawn_turret']:
-            game_state.game_map.add_unit(FACTORY, turret_location)
+            serialized_string['p1Units'][2].append([turret_location[0], turret_location[1], 100, str(random.randint(1000, 10000))])
         for wall_location in strategy['spawn_wall']:
-            game_state.game_map.add_unit(FACTORY, wall_location)
+            serialized_string['p1Units'][0].append([int(wall_location[0]), int(wall_location[1]), 75, str(random.randint(100, 1000))])
         for factory_location in strategy['upgrade_factory']:
-            game_state.game_map[factory_location[0], factory_location[1]].upgrade()
+            serialized_string['p1Units'][7].append([factory_location[0], factory_location[1], 30, str(random.randint(1000, 10000)) ])
         for turret_location in strategy['upgrade_turret']:
-            game_state.game_map[turret_location[0], turret_location[1]].upgrade()
+            serialized_string['p1Units'][7].append([turret_location[0], turret_location[1], 200, str(random.randint(1000, 10000))])
         for wall_location in strategy['upgrade_factory']:
-            game_state.game_map[wall_location[0], wall_location[1]].upgrade()
+            serialized_string['p1Units'][7].append([wall_location[0], wall_location[1], 300, str(random.randint(1000, 10000))])
 
-    def evaluate_offense(self, game_state, strategy):
+        gamelib.debug_write(json.dumps(serialized_string))
+        new_game_state = GameState(self.config, json.dumps(serialized_string))
+        return new_game_state
+
+    def evaluate_offense(self, game_state):
         '''
         :param game_state:
         :return:
         '''
 
         return 1
-    def evaluate_defense(self, game_state, strategy):
+    def evaluate_defense(self, game_state):
         '''
         :param game_state:
         :return:
@@ -651,8 +665,6 @@ class AlgoStrategy(gamelib.AlgoCore):
             res = []
             strategy['spawn_scout'] = res.copy()
             new_strategies.append([strategy.copy(), current_mp])
-            res = []
-            strategy = {}
             if current_mp > 0:
                 for i in scout_location:
                     strategy['spawn_scout'] = [i for j in range(int(current_mp))]
@@ -668,8 +680,6 @@ class AlgoStrategy(gamelib.AlgoCore):
             res = []
             strategy['spawn_demolisher'] = res.copy()
             new_strategies.append([strategy.copy(), current_mp])
-            res = []
-            strategy = {}
             if current_mp > 0:
                 for i in demolisher_location:
                     strategy['spawn_demolisher'] = [i for j in range(int(current_mp))]
