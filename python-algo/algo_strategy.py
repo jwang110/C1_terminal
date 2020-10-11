@@ -419,14 +419,17 @@ class AlgoStrategy(gamelib.AlgoCore):
         edge_point = self.get_def_point_by_turret(my_turret,game_state)
         return edge_point
     
-    def get_def_point_by_turret(self,my_turret,game_state):
+    def get_def_point_by_turret(self,my_turret,game_state,upgraded_tur=None):
         edge_range = range(-2,30)
         edge_point =dict.fromkeys(edge_range,0)
         for i in my_turret:
             x = i[0]
             y = i[1]
             location = [x,y]
-            tur_upgraded = game_state.game_map[location].upgraded
+            if upgraded_tur ==None:
+                tur_upgraded = game_state.game_map[location[0],location[1]][0].upgraded
+            else:
+                tur_upgraded = i in upgraded_tur
             tur_hp = i[2]
             check_even=(x+y)%2==0
             sum_xy = x+y
@@ -509,12 +512,53 @@ class AlgoStrategy(gamelib.AlgoCore):
                 location.append([x,x-14])
         return location
 
-    def interceptors_spawn(self,game_state,number_to_spawn):
+    def interceptors_spawn(self,game_state,my_mp):
+        new_strategies = []
         edge_point = self.eval_def(game_state)
+        for strategy_ in strategies:
+            strategy, _ = strategy_
+            gamelib.debug_write(strategy)
+            res = []
+            strategy['spawn_interceptor'] = res.copy()
+            new_strategies.append([strategy.copy(), my_mp])
+            new_def =get_def_point_by_turret(self,strategy['spawn_turret'],game_state,strategy['upgrade_turret'])
+            for i in range(0,28):
+                new_def[i] = edge_point[i] + new_def[i]
+
+            if my_mp < 1:
+                continue
+            else:
+                n = int(current_sp)
+                wall_candidate_ = []
+                for new_turret in new_turrets:
+                    wall_candidate_ += self.find_wall_location(new_turret)
+                temp = [i for i in WALL_LOCATIONS if i not in wall_candidate_]
+                wall_candidate_.extend(temp)
+
+                i = 0
+                j = 0
+                while (i < n) and (j < len(wall_candidate_)):
+                    candidate = wall_candidate_[j]
+                    if game_state.can_spawn(TURRET, candidate):
+                        i += 1
+                        current_sp -= 1
+                        res.append(candidate)
+                        strategy['spawn_wall'] = res.copy()
+                        new_strategies.append([strategy.copy(), current_sp])
+                    else:
+                        pass
+                    j += 1
+
+
+
+
+        number_to_spawn = 
         min_def = sorted(edge_point,key = edge_point.get())
         min_def_index = min_def[0:number_to_spawn]
-        location = self.get_location_from_x(min_def_index) 
-        game_state.attempt_spawn(INTERCEPTOR,location)
+        location = self.get_location_from_x(min_def_index)
+        #retur nthe location of weak defense
+        return location
+        
 
     def eval_off(self,game_state):
         game_dict= json.loads(game_state.serialized_string)
