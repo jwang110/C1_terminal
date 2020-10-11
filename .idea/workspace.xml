@@ -36,8 +36,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/python-algo/algo_strategy.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="265">
-              <caret line="136" column="68" lean-forward="true" selection-start-line="136" selection-start-column="68" selection-end-line="136" selection-end-column="68" />
+            <state relative-caret-position="376">
+              <caret line="256" column="21" lean-forward="true" selection-start-line="256" selection-start-column="21" selection-end-line="256" selection-end-column="21" />
             </state>
           </provider>
         </entry>
@@ -103,6 +103,7 @@
       <find>structure</find>
       <find>upgraded</find>
       <find>gamelib.deb</find>
+      <find>gamelib.debug_write</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -357,8 +358,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/python-algo/algo_strategy.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="265">
-          <caret line="136" column="68" lean-forward="true" selection-start-line="136" selection-start-column="68" selection-end-line="136" selection-end-column="68" />
+        <state relative-caret-position="376">
+          <caret line="256" column="21" lean-forward="true" selection-start-line="256" selection-start-column="21" selection-end-line="256" selection-end-column="21" />
         </state>
       </provider>
     </entry>

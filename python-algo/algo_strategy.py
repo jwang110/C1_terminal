@@ -160,7 +160,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         :param game_state:
         :return: a list of possible locations to spawn factory
         '''
-        gamelib.debug_write(strategies)
+        #gamelib.debug_write(strategies)
         new_strategies = []
         for strategy_ in strategies:
             strategy, current_sp = strategy_
@@ -260,7 +260,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                     candidate_location = current_turrets[i][0:2]
                     i = i + 1
                     #gamelib.debug_write(candidate_location)
-                   # candidate = game_state.game_map[candidate_location[0], candidate_location[1]]
+                    #candidate = game_state.game_map[candidate_location[0], candidate_location[1]]
                     #gamelib.debug_write(candidate)
                     if not game_state.game_map[candidate_location[0], candidate_location[1]][0].upgraded:
                         res.append(candidate_location)
@@ -276,7 +276,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         #gamelib.debug_write('5')
         for strategy_ in strategies:
             strategy, current_sp = strategy_
-            gamelib.debug_write(strategy)
+            #gamelib.debug_write(strategy)
             res = []
             strategy['spawn_wall'] = res.copy()
             new_strategies.append([strategy.copy(), current_sp])
