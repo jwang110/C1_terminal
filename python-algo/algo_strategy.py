@@ -416,17 +416,17 @@ class AlgoStrategy(gamelib.AlgoCore):
     def eval_def(self,game_state):
         game_dict= json.loads(game_state.serialized_string)
         my_turret = game_dict['p1Units'][2]
-        edge_point = self.get_def_point_by_turret(my_turret)
+        edge_point = self.get_def_point_by_turret(my_turret,game_state)
         return edge_point
     
-    def get_def_point_by_turret(self,my_turret):
+    def get_def_point_by_turret(self,my_turret,game_state):
         edge_range = range(-2,30)
         edge_point =dict.fromkeys(edge_range,0)
         for i in my_turret:
             x = i[0]
             y = i[1]
             location = [x,y]
-            tur_upgraded = location.upgraded
+            tur_upgraded = game_state.game_map[location].upgraded
             tur_hp = i[2]
             check_even=(x+y)%2==0
             sum_xy = x+y
@@ -521,7 +521,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         oppo_turret = game_dict['p2Units'][2]
         for i in oppo_turret:
             i[1] = 27-i[1]
-        edge_point = self.get_def_point_by_turret(oppo_turret)
+        edge_point = self.get_def_point_by_turret(oppo_turret,game_state)
         return edge_point
 
 
