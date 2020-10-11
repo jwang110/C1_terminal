@@ -85,6 +85,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         strategies = self.turret_upgrade(game_state, strategies)
         strategies = self.wall_spawn(game_state, strategies)
         strategies = self.wall_upgrade(game_state, strategies)
+        strategies = self.interceptor_spawn(game_state, current_mp, strategies)
         # gamelib.debug_write('The current first strategy is {}'.format(strategies))
         return strategies
 
@@ -99,7 +100,8 @@ class AlgoStrategy(gamelib.AlgoCore):
             game_state.attempt_spawn(WALL, strategy['spawn_wall'])
         if len(strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory']) != 0:
             game_state.attempt_upgrade(strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory'])
-
+        if len(strategy['spawn_interceptor']) != 0:
+            game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
 
     def factory_upgrade(self, game_state, cur_sp):
         '''
@@ -540,53 +542,41 @@ class AlgoStrategy(gamelib.AlgoCore):
                 location.append([x,x-14])
         return location
 
-    def interceptors_spawn(self,game_state,my_mp):
+    def interceptor_spawn(self,game_state,my_mp,strategies):
+        
         new_strategies = []
         edge_point = self.eval_def(game_state)
+        inter_add = 10
+        
         for strategy_ in strategies:
             strategy, _ = strategy_
-            gamelib.debug_write(strategy)
+            #gamelib.debug_write(strategy)
+            
             res = []
             strategy['spawn_interceptor'] = res.copy()
             new_strategies.append([strategy.copy(), my_mp])
-            new_def =get_def_point_by_turret(self,strategy['spawn_turret'],game_state,strategy['upgrade_turret'])
-            for i in range(0,28):
-                new_def[i] = edge_point[i] + new_def[i]
+            
 
             if my_mp < 1:
                 continue
             else:
-                n = int(current_sp)
-                wall_candidate_ = []
-                for new_turret in new_turrets:
-                    wall_candidate_ += self.find_wall_location(new_turret)
-                temp = [i for i in WALL_LOCATIONS if i not in wall_candidate_]
-                wall_candidate_.extend(temp)
-
-                i = 0
-                j = 0
-                while (i < n) and (j < len(wall_candidate_)):
-                    candidate = wall_candidate_[j]
-                    if game_state.can_spawn(TURRET, candidate):
-                        i += 1
-                        current_sp -= 1
-                        res.append(candidate)
-                        strategy['spawn_wall'] = res.copy()
-                        new_strategies.append([strategy.copy(), current_sp])
-                    else:
-                        pass
-                    j += 1
+                new_def = self.get_def_point_by_turret(self,strategy['spawn_turret'],game_state,strategy['upgrade_turret'])
+                for i in range(0,28):
+                    new_def[i] = edge_point[i] + new_def[i]
+                                                    
+                curr_mp = my_mp
+                while curr_mp>0:
+                    curr_mp -= 1
+                    min_def_index = sorted(new_def,key = edge_point.get())
+                    res.append(self.get_location_from_x([min_def_index[0]])[0])
+                    new_def[min_def_index[0]] += inter_add
+                    
+                    if len(res)>=5:
+                        strategy['spawn_interceptor'] = res.copy()
+                        new_strategies.append([strategy.copy(), curr_mp])                    
+        return new_strategies
 
 
-
-
-        number_to_spawn = 
-        min_def = sorted(edge_point,key = edge_point.get())
-        min_def_index = min_def[0:number_to_spawn]
-        location = self.get_location_from_x(min_def_index)
-        #retur nthe location of weak defense
-        return location
-        
 
     def eval_off(self,game_state):
         game_dict= json.loads(game_state.serialized_string)
