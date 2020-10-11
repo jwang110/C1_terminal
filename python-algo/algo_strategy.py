@@ -408,10 +408,14 @@ class AlgoStrategy(gamelib.AlgoCore):
             game_state.attempt_spawn(TURRET, build_location)
 
     def eval_def(self,game_state):
-        edge_range = range(-2,30)
-        edge_point =dict.fromkeys(edge_range,0)
         game_dict= json.loads(game_state.serialized_string)
         my_turret = game_dict['p1Units'][2]
+        edge_point = self.get_def_point_by_turret
+        return edge_point
+    
+    def get_def_point_by_turret(self,my_turret):
+        edge_range = range(-2,30)
+        edge_point =dict.fromkeys(edge_range,0)
         for i in my_turret:
             x = i[0]
             y = i[1]
@@ -490,7 +494,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         del edge_point[29]
         return edge_point
 
-    def get_location_from_x(x_list):
+    def get_location_from_x(self,x_list):
         location = []
         for x in x_list:
             if x<=13:
@@ -503,8 +507,12 @@ class AlgoStrategy(gamelib.AlgoCore):
         edge_point = eval_def(game_state)
         min_def = sorted(edge_point,key = edge_point.get())
         min_def_index = min_def[0:number_to_spawn]
-        location = get_location_from_x(min_def_index) 
+        location = self.get_location_from_x(min_def_index) 
         game_state.attempt_spawn(INTERCEPTOR,location)
+
+    def eval_off(self,game_state):
+
+
 
 
 
