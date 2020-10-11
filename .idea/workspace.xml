@@ -24,8 +24,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/python-algo/gamelib/game_state.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="884">
-              <caret line="138" column="31" lean-forward="true" selection-start-line="138" selection-start-column="31" selection-end-line="138" selection-end-column="31" />
+            <state relative-caret-position="186">
+              <caret line="474" column="64" lean-forward="true" selection-start-line="474" selection-start-column="64" selection-end-line="474" selection-end-column="64" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -36,8 +36,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/python-algo/algo_strategy.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="547">
-              <caret line="448" column="43" lean-forward="true" selection-start-line="448" selection-start-column="43" selection-end-line="448" selection-end-column="43" />
+            <state relative-caret-position="396">
+              <caret line="442" column="58" lean-forward="true" selection-start-line="442" selection-start-column="58" selection-end-line="442" selection-end-column="58" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -118,6 +118,7 @@
       <find>gamelib.debug_write</find>
       <find>gamelib.debug</find>
       <find>eval</find>
+      <find>find_pa</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -267,7 +268,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24954791" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -362,8 +362,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/python-algo/gamelib/game_state.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="884">
-          <caret line="138" column="31" lean-forward="true" selection-start-line="138" selection-start-column="31" selection-end-line="138" selection-end-column="31" />
+        <state relative-caret-position="186">
+          <caret line="474" column="64" lean-forward="true" selection-start-line="474" selection-start-column="64" selection-end-line="474" selection-end-column="64" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
@@ -372,8 +372,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/python-algo/algo_strategy.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="547">
-          <caret line="448" column="43" lean-forward="true" selection-start-line="448" selection-start-column="43" selection-end-line="448" selection-end-column="43" />
+        <state relative-caret-position="396">
+          <caret line="442" column="58" lean-forward="true" selection-start-line="442" selection-start-column="58" selection-end-line="442" selection-end-column="58" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
           </folding>

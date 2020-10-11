@@ -21,15 +21,15 @@ FACTORY_LOCATIONS = [[5, 8], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], [
                      [12, 1], [15, 1], [15, 2], [12, 2], [13, 2],
                      [14, 2], [14, 1], [13, 1], [13, 0], [14, 0]]
 FACTORY_LOCATIONS.reverse()
-TURRET_LOCATIONS = [[1, 12], [2, 12], [3, 12], [4, 12], [5, 12], [6, 12], [7, 12], [8, 12], [9, 12], [10, 12],
+TURRET_LOCATIONS = [[2, 12], [3, 12], [4, 12], [5, 12], [6, 12], [7, 12], [8, 12], [9, 12], [10, 12],
                     [11, 12], [12, 12], [13, 12], [14, 12], [15, 12], [16, 12], [17, 12], [18, 12], [19, 12], [20, 12],
                     [21, 12],
-                    [22, 12], [23, 12], [24, 12], [25, 12], [26, 12]]
-WALL_LOCATIONS = [[0, 13], [1, 13], [2, 13], [3, 13], [4, 13], [5, 13], [6, 13], [7, 13], [8, 13], [9, 13], [10, 13],
+                    [22, 12], [23, 12], [24, 12], [25, 12]]
+WALL_LOCATIONS = [[1, 13], [2, 13], [3, 13], [4, 13], [5, 13], [6, 13], [7, 13], [8, 13], [9, 13], [10, 13],
                   [11, 13],
                   [12, 13], [13, 13], [14, 13], [15, 13], [16, 13], [17, 13], [18, 13], [19, 13], [20, 13], [21, 13],
                   [22, 13],
-                  [23, 13], [24, 13], [25, 13], [26, 13], [27, 13]]
+                  [23, 13], [24, 13], [25, 13], [26, 13]]
 
 """
 Most of the algo code you write will be in this file unless you create new
@@ -115,7 +115,8 @@ class AlgoStrategy(gamelib.AlgoCore):
         return strategies
 
     def test(self, game_state):
-        strategy = self.create_defense_strategy_list(game_state)[-1][0]
+        #strategy = self.create_defense_strategy_list(game_state)[-1][0]
+        strategy = self.search_greedy_best_strategy(game_state, self.create_defense_strategy_list(game_state))
         #gamelib.debug_write(strategy)
         if len(strategy['spawn_factory']) != 0:
             game_state.attempt_spawn(FACTORY, strategy['spawn_factory'])
@@ -132,7 +133,7 @@ class AlgoStrategy(gamelib.AlgoCore):
             game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
         if len(strategy['spawn_demolisher']) != 0:
             game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
-        gamelib.debug_write(self.search_greedy_best_strategy(game_state, self.create_defense_strategy_list(game_state)))
+        #gamelib.debug_write(self.search_greedy_best_strategy(game_state, self.create_defense_strategy_list(game_state)))
 
 
     def factory_upgrade(self, game_state, cur_sp):
@@ -374,15 +375,20 @@ class AlgoStrategy(gamelib.AlgoCore):
         '''
         best_strategy = None
         best_score = -1
+        gamelib.debug_write(len(strategies))
+
         for strategy_ in strategies:
-            current_game_state = deepcopy(self.current_state)
+
+            # if i % 1000 == 0:
+            #     gamelib.debug_write('hahahha')
+            #current_game_state = deepcopy(self.current_state)
             #gamelib.debug_write(current_game_state.game_map[13,0])
             #gamelib.debug_write(current_game_state.serialized_string)
             #current_frame_state = deepcopy(self.current_serial_string)
-            current_game_map = deepcopy(self.current_game_map)
+            #current_game_map = deepcopy(self.current_game_map)
             strategy, current_sp = strategy_
             #gamelib.debug_write(current_game_state.serialized_string)
-            current_game_state = self.update_game_map(current_game_state, strategy)
+            #current_game_state = self.update_game_map(current_game_state, strategy)
 
             # if len(strategy['spawn_factory']) != 0:
             #     current_game_state.attempt_spawn(FACTORY, strategy['spawn_factory'])
@@ -405,13 +411,28 @@ class AlgoStrategy(gamelib.AlgoCore):
             #         gamelib.debug_write(self.current_state.game_map[x, y])
 
             #gamelib.debug_write(self.current_state.serialized_string == current_game_state.serialized_string)
-            cur_def_score = self.evaluate_defense(current_game_state) + self.evaluate_offense(current_game_state)
-            if cur_def_score > best_score:
-                best_defense_score = cur_def_score
-                best_defense = strategy
+            #cur_def_score = self.evaluate_defense(current_game_state) + self.evaluate_offense(current_game_state, strategy)
+            cur_score = self.evaluate_strategy(strategy, game_state)
+            if cur_score > best_score:
+                best_score = cur_score
+                best_strategy = strategy
 
         return best_strategy
 
+    def evaluate_strategy(self, strategy, game_state):
+        heuristic = 0
+        serialized_string = json.loads(game_state.serialized_string)
+        my_factories = serialized_string['p1Units'][2]
+        my_turrets = serialized_string['p1Units'][1]
+        my_walls = serialized_string['p1Units'][0]
+        enemy_factories = serialized_string['p2Units'][2]
+        enemy_turrets = serialized_string['p2Units'][1]
+        enemy_walls = serialized_string['p2Units'][0]
+
+        heuristic = 100*len(strategy['upgrade_factory']) + 40*len(strategy['spawn_factory']) + \
+            20*len(my_factories)*len(strategy['upgrade_turret']) + 5*len(my_factories)*len(strategy['spawn_turret']) + 2*len(my_walls)*len(my_turrets)*len(strategy['upgrade_wall'])+\
+            2*len(my_turrets)*len(strategy['spawn_wall']) + 50*len(strategy['spawn_interceptor'])+ 20*len(enemy_turrets)*len(strategy['spawn_demolisher'])+10*1/(1+len(enemy_turrets))*len(strategy['spawn_scout'])
+        return heuristic
     def update_game_map(self, game_state, strategy):
         '''
 
@@ -419,9 +440,10 @@ class AlgoStrategy(gamelib.AlgoCore):
         :param strategy:
         :return:
         '''
-        gamelib.debug_write(game_state.serialized_string)
+        #gamelib.debug_write(game_state.serialized_string)
         serialized_string = json.loads(game_state.serialized_string)
         #gamelib.debug_write(serialized_string)
+        #defense
         for factory_location in strategy['spawn_factory']:
             serialized_string['p1Units'][1].append([factory_location[0], factory_location[1], 30, str(random.randint(1000, 10000))])
         for turret_location in strategy['spawn_turret']:
@@ -432,96 +454,178 @@ class AlgoStrategy(gamelib.AlgoCore):
             serialized_string['p1Units'][7].append([factory_location[0], factory_location[1], 30, str(random.randint(1000, 10000)) ])
         for turret_location in strategy['upgrade_turret']:
             serialized_string['p1Units'][7].append([turret_location[0], turret_location[1], 200, str(random.randint(1000, 10000))])
-        for wall_location in strategy['upgrade_factory']:
+        for wall_location in strategy['upgrade_wall']:
             serialized_string['p1Units'][7].append([wall_location[0], wall_location[1], 300, str(random.randint(1000, 10000))])
 
-        gamelib.debug_write(json.dumps(serialized_string))
+        #offense
+        for scout_location in strategy['spawn_scout']:
+            serialized_string['p1Units'][3].append([scout_location[0], scout_location[1], 15, str(random.randint(1000, 10000))])
+        for demolisher_location in strategy['spawn_demolisher']:
+            serialized_string['p1Units'][4].append([demolisher_location[0], demolisher_location[1], 5, str(random.randint(1000, 10000))])
+        for interceptor_location in strategy['spawn_interceptor']:
+            serialized_string['p1Units'][5].append([interceptor_location[0], interceptor_location[1], 40, str(random.randint(1000, 10000))])
+
+        #gamelib.debug_write(json.dumps(serialized_string))
         new_game_state = GameState(self.config, json.dumps(serialized_string))
         return new_game_state
 
-    def evaluate_offense(self, game_state):
+    def evaluate_offense(self, game_state, strategy):
         '''
         :param game_state:
         :return:
         '''
+        #Get the three locations
 
-        return 1
-    def evaluate_defense(self, game_state):
-        '''
-        :param game_state:
-        :return:
-        '''
-        my_factories = self.current_serial_string['p1Units'][2]
-        my_turrets = self.current_serial_string['p1Units'][1]
-        my_walls = self.current_serial_string['p1Units'][0]
+        # my_scout = strategy['spawn_scout']
+        #
+        # my_demolisher = strategy['spawn_demolisher']
+        # #gamelib.debug_write(my_demolisher)
+        # my_it = strategy['spawn_interceptor']
+        # #gamelib.debug_write(my_it)
+        # value = 0
+        # G = self.eval_off(game_state)
+        #
+        # for i in my_scout:
+        #     path_temp = game_state.find_path_to_edge(i)
+        #     if path_temp is not None:
+        #         #gamelib.debug_write(path_temp)
+        #         value += 1 / (G[path_temp[-1][0]] + 0.001)
+        #
+        # for i in my_demolisher:
+        #     path_temp = game_state.find_path_to_edge(i)
+        #
+        #     if path_temp is not None:
+        #         value += 4 / (G[path_temp[-1][0]] + 0.001)
+        # for i in my_it:
+        #     path_temp = game_state.find_path_to_edge(i)
+        #     if path_temp is not None:
+        #         value += 1 / (G[path_temp[-1][0]] + 0.001)
 
-        return 1
+        return 0
 
-    """
-    NOTE: All the methods after this point are part of the sample starter-algo
-    strategy and can safely be replaced for your custom algo.
-    """
+    # def evaluate_defense(self, game_state):
+    #     '''
+    #     :param game_state:
+    #     :return:
+    #     '''
+    #     # serialized_string = json.loads(game_state.serialized_string)
+    #     # my_factories = serialized_string['p1Units'][2]
+    #     # my_turrets = serialized_string['p1Units'][1]
+    #     # my_walls = serialized_string['p1Units'][0]
+    #     # heuristic = 1
+    #     # if not my_factories == []:
+    #     #     for factory in my_factories:
+    #     #         location = factory[0:2]
+    #     #         if game_state.game_map[location[0], location[1]][0].upgraded:
+    #     #             heuristic += 20
+    #     #         else:
+    #     #             heuristic += 10
+    #     heuristic = 1
+    #     return heuristic
 
-    def starter_strategy(self, game_state):
-        """
-        For defense we will use a spread out layout and some interceptors early on.
-        We will place turrets near locations the opponent managed to score on.
-        For offense we will use long range demolishers if they place stationary units near the enemy's front.
-        If there are no stationary units to attack in the front, we will send Scouts to try and score quickly.
-        """
-        # First, place basic defenses
-        self.build_defences(game_state)
-        # Now build reactive defenses based on where the enemy scored
-        self.build_reactive_defense(game_state)
+        def evaluate_defense(self, game_state):
+            '''
+            :param game_state:
+            :return:
+            '''
+            serialized_string = json.loads(game_state.serialized_string)
+            my_turret = serialized_string['p1Units'][1]
+            my_wall = serialized_string['p1Units'][0]
+            my_factories = serialized_string['p1Units'][2]
+            heuristic = 0
+            G = self.get_def_point_by_turret(my_turret, game_state)
+            D = dict()
+            for i in G.keys():
+                D[i] = 1
+            for i in my_factories:
+                D[i[0]] = 2
+            for i in self.scored_on_locations:
+                D[i[0]] = 5
 
-        # If the turn is less than 5, stall with interceptors and wait to see enemy's base
-        if game_state.turn_number < 2:
-            if game_state.turn_number == 0:
-                game_state.attempt_spawn(FACTORY, [[13, 0], [14, 0]])
-                game_state.attempt_spawn(INTERCEPTOR, [[8, 5], [12, 1], [18, 4], [22, 8], [27, 13]])
-                game_state.attempt_spawn(TURRET, [[4, 12]])
-                game_state.attempt_upgrade([[13, 0]])
-            if game_state.turn_number == 1:
-                if SP < 9:
-                    game_state.attempt_spawn(TURRET, [[9, 12], [23, 12]])
-                    game_state.attempt_spawn(WALL, [[9, 13]])
-                if SP >= 9:
-                    game_state.attempt_upgrade([[14, 0]])
-                    if (SP - 9) >= 2:
-                        game_state.attempt_spawn(TURRET, [[23, 12]])
-                    game_state.attempt_spawn(INTERCEPTOR, [[8, 5], [12, 1], [18, 4], [22, 8], [27, 13], [0, 13]])
-        else:
-            pass
+            for i in G.keys():
+                heuristic += D[i] * G[i]
 
-    def build_defences(self, game_state):
-        """
-        Build basic defenses using hardcoded locations.
-        Remember to defend corners and avoid placing units in the front where enemy demolishers can attack them.
-        """
-        # Useful tool for setting up your base locations: https://www.kevinbai.design/terminal-map-maker
-        # More community tools available at: https://terminal.c1games.com/rules#Download
+            return heuristic
 
-        # Place turrets that attack enemy units
-        turret_locations = [[0, 13], [27, 13], [8, 11], [19, 11], [13, 11], [14, 11]]
-        # attempt_spawn will try to spawn units if we have resources, and will check if a blocking unit is already there
-        game_state.attempt_spawn(TURRET, turret_locations)
+    def evaluate_prod(self, game_state):
+        heuristic = 0
+        serialized_string = json.loads(game_state.serialized_string)
+        my_factories = serialized_string['p1Units'][2]
+        if not my_factories == []:
+            for factory in my_factories:
+                location = factory[0:2]
+                if game_state.game_map[location[0], location[1]][0].upgraded:
+                    heuristic += 10
+                else:
+                    heuristic += 1
 
-        # Place walls in front of turrets to soak up damage for them
-        wall_locations = [[8, 12], [19, 12]]
-        game_state.attempt_spawn(WALL, wall_locations)
-        # upgrade walls so they soak more damage
-        game_state.attempt_upgrade(wall_locations)
+        return heuristic
 
-    def build_reactive_defense(self, game_state):
-        """
-        This function builds reactive defenses based on where the enemy scored on us from.
-        We can track where the opponent scored by looking at events in action frames
-        as shown in the on_action_frame function
-        """
-        for location in self.scored_on_locations:
-            # Build turret one space above so that it doesn't block our own edge spawn locations
-            build_location = [location[0], location[1] + 1]
-            game_state.attempt_spawn(TURRET, build_location)
+    # """
+    # NOTE: All the methods after this point are part of the sample starter-algo
+    # strategy and can safely be replaced for your custom algo.
+    # """
+    #
+    # def starter_strategy(self, game_state):
+    #     """
+    #     For defense we will use a spread out layout and some interceptors early on.
+    #     We will place turrets near locations the opponent managed to score on.
+    #     For offense we will use long range demolishers if they place stationary units near the enemy's front.
+    #     If there are no stationary units to attack in the front, we will send Scouts to try and score quickly.
+    #     """
+    #     # First, place basic defenses
+    #     self.build_defences(game_state)
+    #     # Now build reactive defenses based on where the enemy scored
+    #     self.build_reactive_defense(game_state)
+    #
+    #     # If the turn is less than 5, stall with interceptors and wait to see enemy's base
+    #     if game_state.turn_number < 2:
+    #         if game_state.turn_number == 0:
+    #             game_state.attempt_spawn(FACTORY, [[13, 0], [14, 0]])
+    #             game_state.attempt_spawn(INTERCEPTOR, [[8, 5], [12, 1], [18, 4], [22, 8], [27, 13]])
+    #             game_state.attempt_spawn(TURRET, [[4, 12]])
+    #             game_state.attempt_upgrade([[13, 0]])
+    #         if game_state.turn_number == 1:
+    #             if SP < 9:
+    #                 game_state.attempt_spawn(TURRET, [[9, 12], [23, 12]])
+    #                 game_state.attempt_spawn(WALL, [[9, 13]])
+    #             if SP >= 9:
+    #                 game_state.attempt_upgrade([[14, 0]])
+    #                 if (SP - 9) >= 2:
+    #                     game_state.attempt_spawn(TURRET, [[23, 12]])
+    #                 game_state.attempt_spawn(INTERCEPTOR, [[8, 5], [12, 1], [18, 4], [22, 8], [27, 13], [0, 13]])
+    #     else:
+    #         pass
+    #
+    # def build_defences(self, game_state):
+    #     """
+    #     Build basic defenses using hardcoded locations.
+    #     Remember to defend corners and avoid placing units in the front where enemy demolishers can attack them.
+    #     """
+    #     # Useful tool for setting up your base locations: https://www.kevinbai.design/terminal-map-maker
+    #     # More community tools available at: https://terminal.c1games.com/rules#Download
+    #
+    #     # Place turrets that attack enemy units
+    #     turret_locations = [[0, 13], [27, 13], [8, 11], [19, 11], [13, 11], [14, 11]]
+    #     # attempt_spawn will try to spawn units if we have resources, and will check if a blocking unit is already there
+    #     game_state.attempt_spawn(TURRET, turret_locations)
+    #
+    #     # Place walls in front of turrets to soak up damage for them
+    #     wall_locations = [[8, 12], [19, 12]]
+    #     game_state.attempt_spawn(WALL, wall_locations)
+    #     # upgrade walls so they soak more damage
+    #     game_state.attempt_upgrade(wall_locations)
+    #
+    # def build_reactive_defense(self, game_state):
+    #     """
+    #     This function builds reactive defenses based on where the enemy scored on us from.
+    #     We can track where the opponent scored by looking at events in action frames
+    #     as shown in the on_action_frame function
+    #     """
+    #     for location in self.scored_on_locations:
+    #         # Build turret one space above so that it doesn't block our own edge spawn locations
+    #         build_location = [location[0], location[1] + 1]
+    #         game_state.attempt_spawn(TURRET, build_location)
 
     def eval_def(self, game_state):
         game_dict = json.loads(game_state.serialized_string)
@@ -529,15 +633,22 @@ class AlgoStrategy(gamelib.AlgoCore):
         edge_point = self.get_def_point_by_turret(my_turret, game_state)
         return edge_point
 
-    def get_def_point_by_turret(self, my_turret, game_state, upgraded_tur=None):
+    def get_def_point_by_turret(self, my_turret, game_state, is_enemy = 0, upgraded_tur=None):
         edge_range = range(-2, 30)
         edge_point = dict.fromkeys(edge_range, 0)
+        #gamelib.debug_write(my_turret)
         for i in my_turret:
+
             x = i[0]
             y = i[1]
-            location = [x, y]
             if upgraded_tur == None:
-                tur_upgraded = game_state.game_map[location[0], location[1]][0].upgraded
+                #gamelib.debug_write(game_state.game_map[x,y])
+                if is_enemy == 1:
+                    tur_upgraded = game_state.game_map[x, 27-y][0].upgraded
+                else:
+                    tur_upgraded = game_state.game_map[x, y][0].upgraded
+
+
             else:
                 tur_upgraded = i in upgraded_tur
             check_even = (x + y) % 2 == 0
@@ -638,8 +749,7 @@ class AlgoStrategy(gamelib.AlgoCore):
             if my_mp < 1:
                 continue
             else:
-                new_def = self.get_def_point_by_turret(strategy['spawn_turret'], game_state,
-                                                       strategy['upgrade_turret'])
+                new_def = self.get_def_point_by_turret(strategy['spawn_turret'], game_state, upgraded_tur=strategy['upgrade_turret'])
                 for i in range(0, 28):
                     new_def[i] = edge_point[i] + new_def[i]
 
@@ -657,7 +767,7 @@ class AlgoStrategy(gamelib.AlgoCore):
 
     def scout_spawn(self, game_state, strategies):
         # Start from the bottom
-        scout_location = [[i, i + 13] for i in range(14)] + [[i, i - 14] for i in range(14, 28)]
+        scout_location = [[i, 13-i] for i in range(2, 12)] + [[25-i, 11-i] for i in range(10)]
         new_strategies = []
 
         for strategy_ in strategies:
@@ -672,7 +782,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         return new_strategies
 
     def demolisher_spawn(self, game_state, strategies):
-        demolisher_location = [[i, i + 13] for i in range(14)] + [[i, i - 14] for i in range(14, 28)]
+        demolisher_location = [[i, 13-i ] for i in range(2, 12)] + [[25-i, 11- i] for i in range(10)]
         new_strategies = []
 
         for strategy_ in strategies:
@@ -691,7 +801,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         oppo_turret = game_dict['p2Units'][2]
         for i in oppo_turret:
             i[1] = 27 - i[1]
-        edge_point = self.get_def_point_by_turret(oppo_turret, game_state)
+        edge_point = self.get_def_point_by_turret(oppo_turret, game_state, is_enemy=1)
         return edge_point
 
     def stall_with_interceptors(self, game_state):
