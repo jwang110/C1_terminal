@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6658fef0-01f0-4d57-828c-bff837759acf" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/python-algo/algo_strategy.py" beforeDir="false" afterPath="$PROJECT_DIR$/python-algo/algo_strategy.py" afterDir="false" />
-    </list>
+    <list default="true" id="6658fef0-01f0-4d57-828c-bff837759acf" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,8 +24,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/python-algo/gamelib/game_state.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="750">
-              <caret line="57" column="30" selection-start-line="57" selection-start-column="13" selection-end-line="57" selection-end-column="30" />
+            <state relative-caret-position="194">
+              <caret line="422" column="53" selection-start-line="422" selection-start-column="45" selection-end-line="422" selection-end-column="53" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -39,8 +36,17 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/python-algo/algo_strategy.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="179">
-              <caret line="74" column="67" selection-start-line="74" selection-start-column="67" selection-end-line="74" selection-end-column="67" />
+            <state relative-caret-position="265">
+              <caret line="136" column="68" lean-forward="true" selection-start-line="136" selection-start-column="68" selection-end-line="136" selection-end-column="68" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/python-algo/gamelib/unit.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="633">
+              <caret line="58" column="34" selection-start-line="58" selection-start-column="34" selection-end-line="58" selection-end-column="34" />
             </state>
           </provider>
         </entry>
@@ -48,7 +54,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/python-algo/gamelib/game_map.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
+            <state relative-caret-position="270">
               <caret line="18" column="29" selection-start-line="18" selection-start-column="29" selection-end-line="18" selection-end-column="29" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
@@ -95,6 +101,8 @@
       <find>can_sp</find>
       <find>scored</find>
       <find>structure</find>
+      <find>upgraded</find>
+      <find>gamelib.deb</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -244,6 +252,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24954791" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -272,13 +281,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/python-algo/gamelib/unit.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="846">
-          <caret line="58" column="34" selection-start-line="58" selection-start-column="34" selection-end-line="58" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/scripts/run_match.py">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -298,26 +300,6 @@
     <entry file="file://$PROJECT_DIR$/python-algo/gamelib/algocore.py">
       <provider selected="true" editor-type-id="text-editor">
         <state>
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/python-algo/gamelib/game_state.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="750">
-          <caret line="57" column="30" selection-start-line="57" selection-start-column="13" selection-end-line="57" selection-end-column="30" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/python-algo/gamelib/game_map.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="18" column="29" selection-start-line="18" selection-start-column="29" selection-end-line="18" selection-end-column="29" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
@@ -346,13 +328,37 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/python-algo/gamelib/game_state.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="194">
+          <caret line="422" column="53" selection-start-line="422" selection-start-column="45" selection-end-line="422" selection-end-column="53" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/python-algo/gamelib/game_map.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="18" column="29" selection-start-line="18" selection-start-column="29" selection-end-line="18" selection-end-column="29" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/python-algo/gamelib/unit.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="633">
+          <caret line="58" column="34" selection-start-line="58" selection-start-column="34" selection-end-line="58" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/python-algo/algo_strategy.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="179">
-          <caret line="74" column="67" selection-start-line="74" selection-start-column="67" selection-end-line="74" selection-end-column="67" />
-          <folding>
-            <element signature="e#48#62#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="265">
+          <caret line="136" column="68" lean-forward="true" selection-start-line="136" selection-start-column="68" selection-end-line="136" selection-end-column="68" />
         </state>
       </provider>
     </entry>
