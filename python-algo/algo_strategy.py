@@ -4,6 +4,7 @@ import math
 import warnings
 from sys import maxsize
 import json
+from copy import deepcopy
 
 FACTORY_LOCATIONS = [[5, 8], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], [12, 8], [13, 8], [14, 8], [15, 8], [16, 8], [17, 8], [18, 8], [19, 8], [20, 8], [21, 8], [22, 8], [6, 7], [7, 7], [8, 7], [9, 7], [10, 7], [11, 7], [12, 7], [13, 7], [14, 7], [15, 7], [16, 7], [17, 7], [18, 7], [19, 7], [20, 7], [21, 7], [7, 6], [8, 6], [9, 6], [10, 6], [11, 6], [12, 6], [13, 6], [14, 6], [15, 6], [16, 6], [17, 6], [18, 6], [19, 6], [20, 6], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5], [13, 5], [14, 5], [15, 5], [16, 5], [17, 5], [18, 5], [19, 5], [9, 4], [10, 4], [11, 4], [12, 4], [13, 4], [14, 4], [15, 4], [16, 4], [17, 4], [18, 4], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3], [15, 3], [16, 3], [17, 3], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2], [16, 2], [12, 1], [13, 1], [14, 1], [15, 1], [13, 0], [14, 0]]
 FACTORY_LOCATIONS.reverse()
@@ -64,15 +65,15 @@ class AlgoStrategy(gamelib.AlgoCore):
         self.test(game_state)
         game_state.submit_turn()
 
-    def create_strategy_list(self, game_state):
+    def create_defense_strategy_list(self, game_state):
         '''
 
         :param game_state:
         :return: list of strategy to be searched
         '''
-        self.current_game_map = game_state.game_map
-        self.current_state = game_state
-        self.current_serial_string = json.loads(game_state.serialized_string)
+        self.current_game_map = deepcopy(game_state.game_map)
+        self.current_state = deepcopy(game_state)
+        self.current_serial_string = deepcopy(json.loads(game_state.serialized_string))
         current_sp = self.current_state.get_resource(SP)
         current_mp = self.current_state.get_resource(MP)
         strategies = []
@@ -88,7 +89,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         return strategies
 
     def test(self, game_state):
-        strategy = self.create_strategy_list(game_state)[-1][0]
+        strategy = self.create_defense_strategy_list(game_state)[-1][0]
         gamelib.debug_write(strategy)
         if len(strategy['spawn_factory']) != 0:
             game_state.attempt_spawn(FACTORY, strategy['spawn_factory'])
@@ -99,31 +100,6 @@ class AlgoStrategy(gamelib.AlgoCore):
         if len(strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory']) != 0:
             game_state.attempt_upgrade(strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory'])
 
-    # def create_strategy(self, game_state, current):
-
-    # # def factory_upgrade(self, game_state, cur_sp, strategies):
-    #     '''
-    #     :param game_state:
-    #     :return: possible locations to upgrade factory
-    #     '''
-    #     # strategies = []
-    #     #
-    #     # current_sp = cur_sp
-    #     # current_factories = self.current_serial_string['p1Units'][0]
-    #     # m = len(current_factories)
-    #     # res = []
-    #     # if current_sp > 10:
-    #     #     n = int((current_sp / 9))
-    #     #     mean = min(n, m)
-    #     #     i = 0
-    #     #     # for i in range(mean):
-    #     #     #     strategy = {}
-    #     #     #     candidate = current_factories[i]
-    #     #     #     if not candidate.upgraded:
-    #     #     #         res.append(candidate)
-    #     #     #         current_sp -= 9
-    #     #     #         strategy['upgrade_factory'] = res
-    #     # return res, current_sp, strategies
 
     def factory_upgrade(self, game_state, cur_sp):
         '''
@@ -347,6 +323,58 @@ class AlgoStrategy(gamelib.AlgoCore):
     def find_wall_location(self, location):
         x,y  = location
         return [[x, y+1]]
+
+
+    def search_greedy_best_strategy(self, game_state, defense_strategies, offense_strategies):
+        '''
+        :param game_state:
+        :param strategies:
+        :return: the best strategy available based on current board
+        '''
+        best_defense = None
+        best_offense = None
+        best_offense_score = -1
+        best_defense_score = -1
+        for strategy_ in defense_strategies:
+            current_game_state = deepcopy(self.current_state)
+            current_frame_state = deepcopy(self.current_serial_string)
+            current_game_map = deepcopy(self.current_game_map)
+            strategy, current_sp = strategy_
+            if len(strategy['spawn_factory']) != 0:
+                current_game_state.attempt_spawn(FACTORY, strategy['spawn_factory'])
+            if len(strategy['spawn_turret']) != 0:
+                current_game_state.attempt_spawn(TURRET, strategy['spawn_turret'])
+            if len(strategy['spawn_wall']) != 0:
+                current_game_state.attempt_spawn(WALL, strategy['spawn_wall'])
+            if len(strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory']) != 0:
+                current_game_state.attempt_upgrade(strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory'])
+            cur_def_score = self.eval_def(current_game_state)
+            if cur_def_score > best_defense_score:
+                best_defense_score = cur_def_score
+                best_defense = strategy
+
+        for strategy_ in offense_strategies:
+            pass
+        return best_defense, best_offense
+
+    # def evaluate_offense(self, game_state):
+    #     '''
+    #     :param game_state:
+    #     :return:
+    #     '''
+    #     pass
+    # def evaluate_defense(self, game_state):
+    #     '''
+    #     :param game_state:
+    #     :return:
+    #     '''
+    #     my_factories = self.current_serial_string['p1Units'][2]
+    #     my_turrets = self.current_serial_string['p1Units'][1]
+    #     my_walls = self.current_serial_string['p1Units'][0]
+    #
+    #     return 0
+
+
     """
     NOTE: All the methods after this point are part of the sample starter-algo
     strategy and can safely be replaced for your custom algo.
@@ -431,7 +459,7 @@ class AlgoStrategy(gamelib.AlgoCore):
             else:
                 tur_upgraded = i in upgraded_tur
             tur_hp = i[2]
-            check_even=(x+y)%2==0
+            check_even=(x+y)%2 == 0
             sum_xy = x+y
             diff_xy = x-y
             normal_def=5
