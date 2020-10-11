@@ -4,7 +4,7 @@ import math
 import warnings
 from sys import maxsize
 import json
-
+from copy import deepcopy
 
 """
 Most of the algo code you write will be in this file unless you create new

@@ -4,6 +4,7 @@ import math
 import warnings
 from sys import maxsize
 import json
+from copy import deepcopy
 
 FACTORY_LOCATIONS = [[5, 8], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], [12, 8], [13, 8], [14, 8], [15, 8], [16, 8], [17, 8], [18, 8], [19, 8], [20, 8], [21, 8], [22, 8], [6, 7], [7, 7], [8, 7], [9, 7], [10, 7], [11, 7], [12, 7], [13, 7], [14, 7], [15, 7], [16, 7], [17, 7], [18, 7], [19, 7], [20, 7], [21, 7], [7, 6], [8, 6], [9, 6], [10, 6], [11, 6], [12, 6], [13, 6], [14, 6], [15, 6], [16, 6], [17, 6], [18, 6], [19, 6], [20, 6], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5], [13, 5], [14, 5], [15, 5], [16, 5], [17, 5], [18, 5], [19, 5], [9, 4], [10, 4], [11, 4], [12, 4], [13, 4], [14, 4], [15, 4], [16, 4], [17, 4], [18, 4], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3], [15, 3], [16, 3], [17, 3], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2], [16, 2], [12, 1], [13, 1], [14, 1], [15, 1], [13, 0], [14, 0]]
 FACTORY_LOCATIONS.reverse()
@@ -28,13 +29,13 @@ class AlgoStrategy(gamelib.AlgoCore):
         super().__init__()
         seed = random.randrange(maxsize)
         random.seed(seed)
-        gamelib.debug_write('Random seed: {}'.format(seed))
+#        gamelib.debug_write('Random seed: {}'.format(seed))
 
     def on_game_start(self, config):
         """ 
         Read in config and perform any initial setup here 
         """
-        gamelib.debug_write('Configuring your custom algo strategy...')
+ #       gamelib.debug_write('Configuring your custom algo strategy...')
         self.config = config
         global WALL, FACTORY, TURRET, SCOUT, DEMOLISHER, INTERCEPTOR, MP, SP
         WALL = config["unitInformation"][0]["shorthand"]
@@ -57,22 +58,22 @@ class AlgoStrategy(gamelib.AlgoCore):
         game engine.
         """
         game_state = gamelib.GameState(self.config, turn_state)
-        gamelib.debug_write('Performing turn {} of your custom algo strategy'.format(game_state.turn_number))
+ #       gamelib.debug_write('Performing turn {} of your custom algo strategy'.format(game_state.turn_number))
         game_state.suppress_warnings(True)  #Comment or remove this line to enable warnings.
 
         #self.starter_strategy(game_state)
         self.test(game_state)
         game_state.submit_turn()
 
-    def create_strategy_list(self, game_state):
+    def create_defense_strategy_list(self, game_state):
         '''
 
         :param game_state:
         :return: list of strategy to be searched
         '''
-        self.current_game_map = game_state.game_map
-        self.current_state = game_state
-        self.current_serial_string = json.loads(game_state.serialized_string)
+        self.current_game_map = deepcopy(game_state.game_map)
+        self.current_state = deepcopy(game_state)
+        self.current_serial_string = deepcopy(json.loads(game_state.serialized_string))
         current_sp = self.current_state.get_resource(SP)
         current_mp = self.current_state.get_resource(MP)
         strategies = []
@@ -84,12 +85,13 @@ class AlgoStrategy(gamelib.AlgoCore):
         strategies = self.turret_upgrade(game_state, strategies)
         strategies = self.wall_spawn(game_state, strategies)
         strategies = self.wall_upgrade(game_state, strategies)
+        strategies = self.interceptor_spawn(game_state, current_mp, strategies)
         # gamelib.debug_write('The current first strategy is {}'.format(strategies))
         return strategies
 
     def test(self, game_state):
-        strategy = self.create_strategy_list(game_state)[-1][0]
-        gamelib.debug_write(strategy)
+        strategy = self.create_defense_strategy_list(game_state)[-1][0]
+#        gamelib.debug_write(strategy)
         if len(strategy['spawn_factory']) != 0:
             game_state.attempt_spawn(FACTORY, strategy['spawn_factory'])
         if len(strategy['spawn_turret']) != 0:
@@ -98,32 +100,8 @@ class AlgoStrategy(gamelib.AlgoCore):
             game_state.attempt_spawn(WALL, strategy['spawn_wall'])
         if len(strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory']) != 0:
             game_state.attempt_upgrade(strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory'])
-
-    # def create_strategy(self, game_state, current):
-
-    # # def factory_upgrade(self, game_state, cur_sp, strategies):
-    #     '''
-    #     :param game_state:
-    #     :return: possible locations to upgrade factory
-    #     '''
-    #     # strategies = []
-    #     #
-    #     # current_sp = cur_sp
-    #     # current_factories = self.current_serial_string['p1Units'][0]
-    #     # m = len(current_factories)
-    #     # res = []
-    #     # if current_sp > 10:
-    #     #     n = int((current_sp / 9))
-    #     #     mean = min(n, m)
-    #     #     i = 0
-    #     #     # for i in range(mean):
-    #     #     #     strategy = {}
-    #     #     #     candidate = current_factories[i]
-    #     #     #     if not candidate.upgraded:
-    #     #     #         res.append(candidate)
-    #     #     #         current_sp -= 9
-    #     #     #         strategy['upgrade_factory'] = res
-    #     # return res, current_sp, strategies
+        if len(strategy['spawn_interceptor']) != 0:
+            game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
 
     def factory_upgrade(self, game_state, cur_sp):
         '''
@@ -160,7 +138,11 @@ class AlgoStrategy(gamelib.AlgoCore):
         :param game_state:
         :return: a list of possible locations to spawn factory
         '''
+<<<<<<< HEAD
         #gamelib.debug_write(strategies)
+=======
+ #       gamelib.debug_write(strategies)
+>>>>>>> 10e37a596e57a59b91f7510096b0a7ff5e41b3c5
         new_strategies = []
         for strategy_ in strategies:
             strategy, current_sp = strategy_
@@ -276,7 +258,11 @@ class AlgoStrategy(gamelib.AlgoCore):
         #gamelib.debug_write('5')
         for strategy_ in strategies:
             strategy, current_sp = strategy_
+<<<<<<< HEAD
             #gamelib.debug_write(strategy)
+=======
+ #           gamelib.debug_write(strategy)
+>>>>>>> 10e37a596e57a59b91f7510096b0a7ff5e41b3c5
             res = []
             strategy['spawn_wall'] = res.copy()
             new_strategies.append([strategy.copy(), current_sp])
@@ -347,6 +333,58 @@ class AlgoStrategy(gamelib.AlgoCore):
     def find_wall_location(self, location):
         x,y  = location
         return [[x, y+1]]
+
+
+    def search_greedy_best_strategy(self, game_state, defense_strategies, offense_strategies):
+        '''
+        :param game_state:
+        :param strategies:
+        :return: the best strategy available based on current board
+        '''
+        best_defense = None
+        best_offense = None
+        best_offense_score = -1
+        best_defense_score = -1
+        for strategy_ in defense_strategies:
+            current_game_state = deepcopy(self.current_state)
+            current_frame_state = deepcopy(self.current_serial_string)
+            current_game_map = deepcopy(self.current_game_map)
+            strategy, current_sp = strategy_
+            if len(strategy['spawn_factory']) != 0:
+                current_game_state.attempt_spawn(FACTORY, strategy['spawn_factory'])
+            if len(strategy['spawn_turret']) != 0:
+                current_game_state.attempt_spawn(TURRET, strategy['spawn_turret'])
+            if len(strategy['spawn_wall']) != 0:
+                current_game_state.attempt_spawn(WALL, strategy['spawn_wall'])
+            if len(strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory']) != 0:
+                current_game_state.attempt_upgrade(strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory'])
+            cur_def_score = self.eval_def(current_game_state)
+            if cur_def_score > best_defense_score:
+                best_defense_score = cur_def_score
+                best_defense = strategy
+
+        for strategy_ in offense_strategies:
+            pass
+        return best_defense, best_offense
+
+    # def evaluate_offense(self, game_state):
+    #     '''
+    #     :param game_state:
+    #     :return:
+    #     '''
+    #     pass
+    # def evaluate_defense(self, game_state):
+    #     '''
+    #     :param game_state:
+    #     :return:
+    #     '''
+    #     my_factories = self.current_serial_string['p1Units'][2]
+    #     my_turrets = self.current_serial_string['p1Units'][1]
+    #     my_walls = self.current_serial_string['p1Units'][0]
+    #
+    #     return 0
+
+
     """
     NOTE: All the methods after this point are part of the sample starter-algo
     strategy and can safely be replaced for your custom algo.
@@ -414,17 +452,24 @@ class AlgoStrategy(gamelib.AlgoCore):
             game_state.attempt_spawn(TURRET, build_location)
 
     def eval_def(self,game_state):
-        edge_range = range(-2,30)
-        edge_point =dict.fromkeys(edge_range,0)
         game_dict= json.loads(game_state.serialized_string)
         my_turret = game_dict['p1Units'][2]
+        edge_point = self.get_def_point_by_turret(my_turret,game_state)
+        return edge_point
+    
+    def get_def_point_by_turret(self,my_turret,game_state,upgraded_tur=None):
+        edge_range = range(-2,30)
+        edge_point =dict.fromkeys(edge_range,0)
         for i in my_turret:
             x = i[0]
             y = i[1]
             location = [x,y]
-            tur_upgraded = location.upgraded
-            tur_hp = i[2]
-            check_even=(x+y)%2==0
+            if upgraded_tur ==None:
+                tur_upgraded = game_state.game_map[location[0],location[1]][0].upgraded
+            else:
+                tur_upgraded = i in upgraded_tur
+#            tur_hp = i[2]
+            check_even=(x+y)%2 == 0
             sum_xy = x+y
             diff_xy = x-y
             normal_def=5
@@ -496,7 +541,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         del edge_point[29]
         return edge_point
 
-    def get_location_from_x(x_list):
+    def get_location_from_x(self,x_list):
         location = []
         for x in x_list:
             if x<=13:
@@ -505,12 +550,56 @@ class AlgoStrategy(gamelib.AlgoCore):
                 location.append([x,x-14])
         return location
 
-    def interceptors_spawn(self,game_state,number_to_spawn):
-        edge_point = eval_def(game_state)
-        min_def = sorted(edge_point,key = edge_point.get())
-        min_def_index = min_def[0:number_to_spawn]
-        location = get_location_from_x(min_def_index) 
-        game_state.attempt_spawn(INTERCEPTOR,location)
+    def interceptor_spawn(self,game_state,my_mp,strategies):
+        
+        new_strategies = []
+        edge_point = self.eval_def(game_state)
+        inter_add = 10
+        
+        for strategy_ in strategies:
+            strategy, _ = strategy_
+            #gamelib.debug_write(strategy)
+            
+            res = []
+            strategy['spawn_interceptor'] = res.copy()
+            new_strategies.append([strategy.copy(), my_mp])
+            
+
+            if my_mp < 1:
+                continue
+            else:
+                new_def = self.get_def_point_by_turret(strategy['spawn_turret'],game_state,strategy['upgrade_turret'])
+                for i in range(0,28):
+                    new_def[i] = edge_point[i] + new_def[i]
+                                                    
+                curr_mp = my_mp
+                while curr_mp>0:
+                    curr_mp -= 1
+                    min_def_index = sorted(new_def,key = new_def.get)
+                    res.append(self.get_location_from_x([min_def_index[0]])[0])
+                    new_def[min_def_index[0]] += inter_add
+                    
+                    if len(res)>=5:
+                        strategy['spawn_interceptor'] = res.copy()
+                        new_strategies.append([strategy.copy(), curr_mp])     
+        gamelib.debug_write(len(new_strategies))  
+        gamelib.debug_write(len(new_strategies)) 
+        gamelib.debug_write(len(new_strategies)) 
+        gamelib.debug_write(len(new_strategies)) 
+        gamelib.debug_write(len(new_strategies))            
+        return new_strategies
+
+
+
+    def eval_off(self,game_state):
+        game_dict= json.loads(game_state.serialized_string)
+        oppo_turret = game_dict['p2Units'][2]
+        for i in oppo_turret:
+            i[1] = 27-i[1]
+        edge_point = self.get_def_point_by_turret(oppo_turret,game_state)
+        return edge_point
+
+
 
 
 
@@ -611,9 +700,9 @@ class AlgoStrategy(gamelib.AlgoCore):
             # When parsing the frame data directly, 
             # 1 is integer for yourself, 2 is opponent (StarterKit code uses 0, 1 as player_index instead)
             if not unit_owner_self:
-                gamelib.debug_write("Got scored on at: {}".format(location))
+#                gamelib.debug_write("Got scored on at: {}".format(location))
                 self.scored_on_locations.append(location)
-                gamelib.debug_write("All locations: {}".format(self.scored_on_locations))
+ #               gamelib.debug_write("All locations: {}".format(self.scored_on_locations))
 
     # ################################################################################################################
     # def ab_strategy_result(self,game_state):
