@@ -29,13 +29,13 @@ class AlgoStrategy(gamelib.AlgoCore):
         super().__init__()
         seed = random.randrange(maxsize)
         random.seed(seed)
-        gamelib.debug_write('Random seed: {}'.format(seed))
+#        gamelib.debug_write('Random seed: {}'.format(seed))
 
     def on_game_start(self, config):
         """ 
         Read in config and perform any initial setup here 
         """
-        gamelib.debug_write('Configuring your custom algo strategy...')
+ #       gamelib.debug_write('Configuring your custom algo strategy...')
         self.config = config
         global WALL, FACTORY, TURRET, SCOUT, DEMOLISHER, INTERCEPTOR, MP, SP
         WALL = config["unitInformation"][0]["shorthand"]
@@ -58,7 +58,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         game engine.
         """
         game_state = gamelib.GameState(self.config, turn_state)
-        gamelib.debug_write('Performing turn {} of your custom algo strategy'.format(game_state.turn_number))
+ #       gamelib.debug_write('Performing turn {} of your custom algo strategy'.format(game_state.turn_number))
         game_state.suppress_warnings(True)  #Comment or remove this line to enable warnings.
 
         #self.starter_strategy(game_state)
@@ -91,7 +91,7 @@ class AlgoStrategy(gamelib.AlgoCore):
 
     def test(self, game_state):
         strategy = self.create_defense_strategy_list(game_state)[-1][0]
-        gamelib.debug_write(strategy)
+#        gamelib.debug_write(strategy)
         if len(strategy['spawn_factory']) != 0:
             game_state.attempt_spawn(FACTORY, strategy['spawn_factory'])
         if len(strategy['spawn_turret']) != 0:
@@ -138,7 +138,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         :param game_state:
         :return: a list of possible locations to spawn factory
         '''
-        gamelib.debug_write(strategies)
+ #       gamelib.debug_write(strategies)
         new_strategies = []
         for strategy_ in strategies:
             strategy, current_sp = strategy_
@@ -254,7 +254,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         #gamelib.debug_write('5')
         for strategy_ in strategies:
             strategy, current_sp = strategy_
-            gamelib.debug_write(strategy)
+ #           gamelib.debug_write(strategy)
             res = []
             strategy['spawn_wall'] = res.copy()
             new_strategies.append([strategy.copy(), current_sp])
@@ -460,7 +460,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                 tur_upgraded = game_state.game_map[location[0],location[1]][0].upgraded
             else:
                 tur_upgraded = i in upgraded_tur
-            tur_hp = i[2]
+#            tur_hp = i[2]
             check_even=(x+y)%2 == 0
             sum_xy = x+y
             diff_xy = x-y
@@ -560,14 +560,14 @@ class AlgoStrategy(gamelib.AlgoCore):
             if my_mp < 1:
                 continue
             else:
-                new_def = self.get_def_point_by_turret(self,strategy['spawn_turret'],game_state,strategy['upgrade_turret'])
+                new_def = self.get_def_point_by_turret(strategy['spawn_turret'],game_state,strategy['upgrade_turret'])
                 for i in range(0,28):
                     new_def[i] = edge_point[i] + new_def[i]
                                                     
                 curr_mp = my_mp
                 while curr_mp>0:
                     curr_mp -= 1
-                    min_def_index = sorted(new_def,key = edge_point.get())
+                    min_def_index = sorted(new_def,key = new_def.get)
                     res.append(self.get_location_from_x([min_def_index[0]])[0])
                     new_def[min_def_index[0]] += inter_add
                     
@@ -687,9 +687,9 @@ class AlgoStrategy(gamelib.AlgoCore):
             # When parsing the frame data directly, 
             # 1 is integer for yourself, 2 is opponent (StarterKit code uses 0, 1 as player_index instead)
             if not unit_owner_self:
-                gamelib.debug_write("Got scored on at: {}".format(location))
+#                gamelib.debug_write("Got scored on at: {}".format(location))
                 self.scored_on_locations.append(location)
-                gamelib.debug_write("All locations: {}".format(self.scored_on_locations))
+ #               gamelib.debug_write("All locations: {}".format(self.scored_on_locations))
 
     # ################################################################################################################
     # def ab_strategy_result(self,game_state):
