@@ -7,6 +7,9 @@ import json
 from copy import deepcopy
 import time
 from gamelib.game_state import GameState
+# import numpy as np
+
+import ast
 # Give a better locations
 FACTORY_LOCATIONS = [[5, 8], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], [12, 8],
                      [13, 8], [14, 8], [15, 8], [16, 8], [17, 8], [18, 8], [19, 8], [20, 8], [21, 8], [22, 8], [6, 7],
@@ -118,17 +121,20 @@ class AlgoStrategy(gamelib.AlgoCore):
         #gamelib.debug_write(strategies)
 
 
-        G = {}
-        for strategy_ in strategies:
-            strategy, _ = strategy_
-            temp =(tuple(strategy['upgrade_factory']),tuple(strategy['spawn_factory']),
-                        tuple(strategy['spawn_turret']), tuple(strategy['upgrade_turret']), tuple(strategy['spawn_wall']), tuple(strategy['upgrade_wall']))
-            G[temp] = G.get(temp, [])
-            G[temp].append([strategy['spawn_interceptor'], strategy['spawn_demolisher'], strategy['spawn_scout']])
-
-        gamelib.debug_write(len(G))
-
-        return G
+        # G = {}
+        # for strategy_ in strategies:
+        #     strategy, _ = strategy_
+        #     temp = [strategy['upgrade_factory'],strategy['spawn_factory'],
+        #                 strategy['spawn_turret'], strategy['upgrade_turret'], strategy['spawn_wall'], strategy['upgrade_wall']]
+        #     gamelib.debug_write(temp)
+        #     gamelib.debug_write(temp)
+        #     G[temp] = G.get(temp, [])
+        #     G[temp].append([strategy['spawn_interceptor'], strategy['spawn_demolisher'], strategy['spawn_scout']])
+        #
+        # gamelib.debug_write(len(G))
+        #
+        # return G
+        return strategies
 
     def test(self, game_state):
         #strategy = self.create_defense_strategy_list(game_state)[-1][0]
@@ -390,13 +396,14 @@ class AlgoStrategy(gamelib.AlgoCore):
         :return: the best strategy available based on current board
         '''
 
-        G = strategies
-        for k in G.keys():
-            defense_strategy = k.split('r')
-            gamelib.debug_write(defense_strategy)
+        # G = strategies
+        # for k in G.keys():
+        #     defense_strategy = k.split('r')
+        #     gamelib.debug_write(defense_strategy)
 
 
-
+        idx = random.sample(range(len(strategies)), 10)
+        strategies = strategies[idx]
         best_strategy = None
         best_score = -1
         gamelib.debug_write(len(strategies))
