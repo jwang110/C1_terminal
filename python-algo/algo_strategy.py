@@ -121,25 +121,25 @@ class AlgoStrategy(gamelib.AlgoCore):
         #gamelib.debug_write(strategies)
 
 
-        # G = {}
-        # for strategy_ in strategies:
-        #     strategy, _ = strategy_
-        #     temp = [strategy['upgrade_factory'],strategy['spawn_factory'],
-        #                 strategy['spawn_turret'], strategy['upgrade_turret'], strategy['spawn_wall'], strategy['upgrade_wall']]
-        #     gamelib.debug_write(temp)
-        #     gamelib.debug_write(temp)
-        #     G[temp] = G.get(temp, [])
-        #     G[temp].append([strategy['spawn_interceptor'], strategy['spawn_demolisher'], strategy['spawn_scout']])
-        #
-        # gamelib.debug_write(len(G))
-        #
-        # return G
-        return strategies
+        G = {}
+        for strategy_ in strategies:
+            strategy, _ = strategy_
+            temp = str([strategy['upgrade_factory'],strategy['spawn_factory'],
+                        strategy['spawn_turret'], strategy['upgrade_turret'], strategy['spawn_wall'], strategy['upgrade_wall']])
+            # gamelib.debug_write(temp)
+            # gamelib.debug_write(temp)
+            G[temp] = G.get(temp, [])
+            G[temp].append([strategy['spawn_interceptor'], strategy['spawn_demolisher'], strategy['spawn_scout']])
+
+        #gamelib.debug_write(len(G))
+
+        return G
+        # return strategies
 
     def test(self, game_state):
         #strategy = self.create_defense_strategy_list(game_state)[-1][0]
         strategy = self.search_greedy_best_strategy(game_state, self.create_defense_strategy_list(game_state))
-        #gamelib.debug_write(strategy)
+        gamelib.debug_write(strategy)
         if len(strategy['spawn_factory']) != 0:
             game_state.attempt_spawn(FACTORY, strategy['spawn_factory'])
         if len(strategy['spawn_turret']) != 0:
@@ -152,9 +152,9 @@ class AlgoStrategy(gamelib.AlgoCore):
         if len(strategy['spawn_interceptor']) != 0:
             game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
         if len(strategy['spawn_scout']) != 0:
-            game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
+            game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_scout'])
         if len(strategy['spawn_demolisher']) != 0:
-            game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
+            game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_demolisher'])
         #gamelib.debug_write(self.search_greedy_best_strategy(game_state, self.create_defense_strategy_list(game_state)))
 
 
@@ -396,59 +396,90 @@ class AlgoStrategy(gamelib.AlgoCore):
         :return: the best strategy available based on current board
         '''
 
-        # G = strategies
-        # for k in G.keys():
-        #     defense_strategy = k.split('r')
-        #     gamelib.debug_write(defense_strategy)
 
+        #strategies = ast.literal_eval(strategies)
 
-        idx = random.sample(range(len(strategies)), 10)
-        strategies = strategies[idx]
         best_strategy = None
         best_score = -1
-        gamelib.debug_write(len(strategies))
-        i = 0
-        for strategy_ in strategies:
-            i+=1
-            if i % 10 == 0:
-                 gamelib.debug_write('hahahha')
-            current_game_state = deepcopy(self.current_state)
-            #gamelib.debug_write(current_game_state.game_map[13,0])
-            #gamelib.debug_write(current_game_state.serialized_string)
-            #current_frame_state = deepcopy(self.current_serial_string)
-            #current_game_map = deepcopy(self.current_game_map)
-            strategy, current_sp = strategy_
-            #gamelib.debug_write(current_game_state.serialized_string)
-            current_game_state = self.update_game_map(current_game_state, strategy)
+        cur_score = []
+        def Get_rank(L, p1, p2, p3):
 
-            # if len(strategy['spawn_factory']) != 0:
-            #     current_game_state.attempt_spawn(FACTORY, strategy['spawn_factory'])
-            # if len(strategy['spawn_turret']) != 0:
-            #     current_game_state.attempt_spawn(TURRET, strategy['spawn_turret'])
-            # if len(strategy['spawn_wall']) != 0:
-            #     current_game_state.attempt_spawn(WALL, strategy['spawn_wall'])
-            # if len(strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory']) != 0:
-            #     current_game_state.attempt_upgrade(
-            #         strategy['upgrade_wall'] + strategy['upgrade_turret'] + strategy['upgrade_factory'])
-            # if len(strategy['spawn_interceptor']) != 0:
-            #     game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
-            # if len(strategy['spawn_scout']) != 0:
-            #     game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
-            # if len(strategy['spawn_demolisher']) != 0:
-            #     game_state.attempt_spawn(INTERCEPTOR, strategy['spawn_interceptor'])
-            # for [x, y] in TURRET_LOCATIONS:
-            #     if current_game_state.game_map[x, y] != self.current_state.game_map[x,y]:
-            #         gamelib.debug_write(current_game_state.game_map[x, y][0])
-            #         gamelib.debug_write(self.current_state.game_map[x, y])
+            l1 = [i[0] for i in L]
+            l2 = [i[1] for i in L]
+            l3 = [i[2] for i in L]
 
-            #gamelib.debug_write(self.current_state.serialized_string == current_game_state.serialized_string)
-            cur_score = self.evaluate_defense(current_game_state) + self.evaluate_offense(current_game_state, strategy) + self.evaluate_prod(current_game_state)
-            #cur_score = self.evaluate_strategy(strategy, game_state)
-            if cur_score > best_score:
-                best_score = cur_score
-                best_strategy = strategy
+            l1 = [sorted(l1).index(x) for x in l1]
+            l2 = [sorted(l2).index(x) for x in l2]
+            l3 = [sorted(l3).index(x) for x in l3]
+            L_new = []
+            for i in range(len(l1)):
+                L_new.append(p1 * l1[i] + p2 * l2[i] + p3 * l3[i])
+            return L_new.index(max(L_new))
+
+        candidates = []
+        for k in random.sample(strategies.keys(), min(10, len(strategies))):
+            defense_strategy = ast.literal_eval(k)
+
+            #gamelib.debug_write(defense_strategy)
+            offense_strategies = random.sample(strategies[k],5)
+            for offense_strategy in offense_strategies:
+                current_game_state = deepcopy(game_state)
+                strategy = self.build_strategy_from_list(defense_strategy, offense_strategy)
+                candidates.append(strategy)
+                new_game_state, serialized_string = self.update_game_map(current_game_state, strategy)
+                # cur_score = self.evaluate_defense(new_game_state, serialized_string) + self.evaluate_offense(new_game_state, strategy) + self.evaluate_prod(
+                #     new_game_state, serialized_string)
+                cur_score.append([self.evaluate_defense(new_game_state, serialized_string), self.evaluate_offense(new_game_state, strategy) , self.evaluate_prod(
+                    new_game_state, serialized_string)])
+
+
+
+
+                # if cur_score > best_score:
+                #     best_score = cur_score
+                #     best_strategy = strategy
+
+        best_strategy_idx = Get_rank(cur_score, 1, 1, 1)
+        best_strategy = candidates[best_strategy_idx]
 
         return best_strategy
+
+    def build_strategy_from_list(self, defense_list, offense_list):
+        strategy = {}
+        strategy['upgrade_factory'] = defense_list[0]
+        strategy['spawn_factory'] = defense_list[1]
+        strategy['spawn_turret'] = defense_list[2]
+        strategy['upgrade_turret'] = defense_list[3]
+        strategy['spawn_wall'] = defense_list[4]
+        strategy['upgrade_wall'] = defense_list[5]
+        strategy['spawn_interceptor'] = offense_list[0]
+        strategy['spawn_demolisher'] = offense_list[1]
+        strategy['spawn_scout'] = offense_list[2]
+        return strategy
+
+        # strategies = random.sample(strategies, 30)
+
+        #gamelib.debug_write(len(strategies))
+        # i = 0
+        # for strategy_ in strategies:
+        #     # i+=1
+        #     # if i % 10 == 0:
+        #     #      gamelib.debug_write('hahahha')
+        #     current_game_state = deepcopy(self.current_state)
+        #     #gamelib.debug_write(current_game_state.game_map[13,0])
+        #     #gamelib.debug_write(current_game_state.serialized_string)
+        #     #current_frame_state = deepcopy(self.current_serial_string)
+        #     #current_game_map = deepcopy(self.current_game_map)
+        #     strategy, current_sp = strategy_
+        #     #gamelib.debug_write(current_game_state.serialized_string)
+        #     current_game_state = self.update_game_map(current_game_state, strategy)
+        #
+
+
+            #gamelib.debug_write(self.current_state.serialized_string == current_game_state.serialized_string)
+            # cur_score = self.evaluate_defense(current_game_state, serialized_string) + self.evaluate_offense(current_game_state, strategy) + self.evaluate_prod(current_game_state)
+            #cur_score = self.evaluate_strategy(strategy, game_state)
+
 
     # def evaluate_strategy(self, strategy, game_state):
     #     heuristic = 0
@@ -500,7 +531,7 @@ class AlgoStrategy(gamelib.AlgoCore):
 
         #gamelib.debug_write(json.dumps(serialized_string))
         new_game_state = GameState(self.config, json.dumps(serialized_string))
-        return new_game_state
+        return new_game_state, serialized_string
 
     def evaluate_offense(self, game_state, strategy):
         '''
@@ -555,12 +586,12 @@ class AlgoStrategy(gamelib.AlgoCore):
     #     heuristic = 1
     #     return heuristic
 
-    def evaluate_defense(self, game_state):
+    def evaluate_defense(self, game_state, serialized_string):
         '''
         :param game_state:
         :return:
         '''
-        serialized_string = json.loads(game_state.serialized_string)
+        # serialized_string = json.loads(game_state.serialized_string)
         my_turret = serialized_string['p1Units'][1]
         my_wall = serialized_string['p1Units'][0]
         my_factories = serialized_string['p1Units'][2]
@@ -579,9 +610,9 @@ class AlgoStrategy(gamelib.AlgoCore):
 
         return heuristic
 
-    def evaluate_prod(self, game_state):
+    def evaluate_prod(self, game_state, serialized_string):
         heuristic = 0
-        serialized_string = json.loads(game_state.serialized_string)
+        # serialized_string = json.loads(game_state.serialized_string)
         my_factories = serialized_string['p1Units'][2]
         if not my_factories == []:
             for factory in my_factories:
