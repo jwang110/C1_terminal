@@ -220,6 +220,8 @@ class AlgoStrategy(gamelib.AlgoCore):
                     j += 1
 
         #gamelib.debug_write(new_strategies)
+        # if len(new_strategies['spawn_factory']) == 0:
+        #     new_strategies.append
         return new_strategies
 
     def turret_spawn(self, game_state, strategies):
@@ -398,7 +400,8 @@ class AlgoStrategy(gamelib.AlgoCore):
 
 
         #strategies = ast.literal_eval(strategies)
-
+        now = time.time()
+        time_limit = 4
         best_strategy = None
         best_score = -1
         cur_score = []
@@ -417,7 +420,9 @@ class AlgoStrategy(gamelib.AlgoCore):
             return L_new.index(max(L_new))
 
         candidates = []
-        for k in random.sample(strategies.keys(), min(10, len(strategies))):
+        for k in random.sample(strategies.keys(), min(50, len(strategies))):
+            if time.time() - now >= time_limit:
+                break
             defense_strategy = ast.literal_eval(k)
 
             #gamelib.debug_write(defense_strategy)
@@ -429,7 +434,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                 new_game_state, serialized_string = self.update_game_map(current_game_state, strategy)
                 # cur_score = self.evaluate_defense(new_game_state, serialized_string) + self.evaluate_offense(new_game_state, strategy) + self.evaluate_prod(
                 #     new_game_state, serialized_string)
-                cur_score.append([self.evaluate_defense(new_game_state, serialized_string), self.evaluate_offense(new_game_state, strategy) , self.evaluate_prod(
+                cur_score.append([self.evaluate_defense(new_game_state, serialized_string), 0, self.evaluate_prod(
                     new_game_state, serialized_string)])
 
 
@@ -439,10 +444,13 @@ class AlgoStrategy(gamelib.AlgoCore):
                 #     best_score = cur_score
                 #     best_strategy = strategy
 
-        best_strategy_idx = Get_rank(cur_score, 1, 1, 1)
+        best_strategy_idx = Get_rank(cur_score, 1, 0, -5)
         best_strategy = candidates[best_strategy_idx]
 
         return best_strategy
+
+
+
 
     def build_strategy_from_list(self, defense_list, offense_list):
         strategy = {}
@@ -481,20 +489,53 @@ class AlgoStrategy(gamelib.AlgoCore):
             #cur_score = self.evaluate_strategy(strategy, game_state)
 
 
-    # def evaluate_strategy(self, strategy, game_state):
-    #     heuristic = 0
-    #     serialized_string = json.loads(game_state.serialized_string)
-    #     my_factories = serialized_string['p1Units'][2]
-    #     my_turrets = serialized_string['p1Units'][1]
-    #     my_walls = serialized_string['p1Units'][0]
-    #     enemy_factories = serialized_string['p2Units'][2]
-    #     enemy_turrets = serialized_string['p2Units'][1]
-    #     enemy_walls = serialized_string['p2Units'][0]
+    # def search_greedy_best_strategy(self, game_state, strategies):
+    #     '''
+    #     :param game_state:
+    #     :param strategies:
+    #     :return: the best strategy available based on current board
+    #     '''
     #
-    #     heuristic = 100*len(strategy['upgrade_factory']) + 40*len(strategy['spawn_factory']) + \
-    #         20*len(my_factories)*len(strategy['upgrade_turret']) + 5*len(my_factories)*len(strategy['spawn_turret']) + 2*len(my_walls)*len(my_turrets)*len(strategy['upgrade_wall'])+\
-    #         2*len(my_turrets)*len(strategy['spawn_wall']) + 50*len(strategy['spawn_interceptor'])+ 20*len(enemy_turrets)*len(strategy['spawn_demolisher'])+10*1/(1+len(enemy_turrets))*len(strategy['spawn_scout'])
-    #     return heuristic
+    #     best_strategy = None
+    #     best_score = -1
+    #
+    #     for strategy_ in random.sample(strategies, min(len(strategies),1000)):
+    #         strategy, _ = strategy_
+    #         current_game_state = deepcopy(game_state)
+    #         #gamelib.debug_write(strategy)
+    #         #new_game_state, serialized_string = self.update_game_map(current_game_state, strategy)
+    #         cur_score = self.evaluate_strategy(strategy, current_game_state)
+    #         #gamelib.debug_write(cur_score)
+    #         if cur_score > best_score:
+    #             best_score = cur_score
+    #             best_strategy = strategy
+    #     return best_strategy
+    #
+
+
+    def evaluate_strategy(self, strategy, game_state):
+        heuristic = 0
+        serialized_string = json.loads(game_state.serialized_string)
+        my_factories = serialized_string['p1Units'][2]
+        my_turrets = serialized_string['p1Units'][1]
+        my_walls = serialized_string['p1Units'][0]
+        enemy_factories = serialized_string['p2Units'][2]
+        enemy_turrets = serialized_string['p2Units'][1]
+        enemy_walls = serialized_string['p2Units'][0]
+
+
+        heuristic = 10*len(strategy['spawn_turret'])*len(strategy['upgrade_turret'])*len('spawn_factory')+\
+                    100*len(strategy['upgrade_factory']) + 40*len(strategy['spawn_factory']) + 80*len(strategy['spawn_factory'])*len(strategy['upgrade_factory']) +\
+                    20*len(my_factories)*len(strategy['upgrade_turret']) + 5*len(my_factories)*len(strategy['spawn_turret']) + 2*len(my_walls)*len(my_turrets)*len(strategy['upgrade_wall'])+\
+                    2*len(my_turrets)*len(strategy['spawn_wall']) + \
+                    50*len(strategy['spawn_interceptor'])+ 20*len(enemy_turrets)*len(strategy['spawn_demolisher'])+\
+                    10*1/(1+len(enemy_turrets))*len(strategy['spawn_scout']) +\
+                    2*len(strategy['spawn_demolisher'])*len(strategy['spawn_interceptor'])
+        return heuristic
+
+
+
+
 
 
     def update_game_map(self, game_state, strategy):
@@ -546,23 +587,23 @@ class AlgoStrategy(gamelib.AlgoCore):
         my_it = strategy['spawn_interceptor']
         #gamelib.debug_write(my_it)
         value = 0
-        G = self.eval_off(game_state)
-
-        for i in my_scout:
-            path_temp = game_state.find_path_to_edge(i)
-            if path_temp is not None:
-                #gamelib.debug_write(path_temp)
-                value += 1 / (G[path_temp[-1][0]] + 0.001)
-
-        for i in my_demolisher:
-            path_temp = game_state.find_path_to_edge(i)
-
-            if path_temp is not None:
-                value += 4 / (G[path_temp[-1][0]] + 0.001)
-        for i in my_it:
-            path_temp = game_state.find_path_to_edge(i)
-            if path_temp is not None:
-                value += 1 / (G[path_temp[-1][0]] + 0.001)
+        # G = self.eval_off(game_state)
+        #
+        # for i in my_scout:
+        #     path_temp = game_state.find_path_to_edge(i)
+        #     if path_temp is not None:
+        #         #gamelib.debug_write(path_temp)
+        #         value += 1 / (G[path_temp[-1][0]] + 0.001)
+        #
+        # for i in my_demolisher:
+        #     path_temp = game_state.find_path_to_edge(i)
+        #
+        #     if path_temp is not None:
+        #         value += 4 / (G[path_temp[-1][0]] + 0.001)
+        # for i in my_it:
+        #     path_temp = game_state.find_path_to_edge(i)
+        #     if path_temp is not None:
+        #         value += 1 / (G[path_temp[-1][0]] + 0.001)
 
         return value
 
@@ -618,9 +659,9 @@ class AlgoStrategy(gamelib.AlgoCore):
             for factory in my_factories:
                 location = factory[0:2]
                 if game_state.game_map[location[0], location[1]][0].upgraded:
-                    heuristic += 10
+                    heuristic += 50
                 else:
-                    heuristic += 1
+                    heuristic += 10
 
         return heuristic
 
